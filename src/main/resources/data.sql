@@ -7,7 +7,7 @@ INSERT INTO staff (first_name, last_name, role, specialization, email)
 VALUES ('John', 'Doe', 'DOCTOR', 'Cardiology', 'john.doe@hospital.com');
 
 -- Insert 1 Patient
-INSERT INTO patients (first_name, last_name, dob, gender, phone_number, email, address)
+INSERT INTO patients (first_name, last_name, date_of_birth, gender, phone_number, email, address)
 VALUES ('John', 'Doe', '1990-05-15', 'Male', '1234567890', 'john@example.com', '123 Main St');
 
 -- Insert 1 Doctor
