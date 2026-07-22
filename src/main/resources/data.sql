@@ -18,5 +18,5 @@ INSERT INTO appointments (patient_id, doctor_id, appointment_date, reason)
 VALUES (1, 2, '2026-08-10 10:00:00', 'Routine Heart Checkup');
 
 -- Insert Inventory Items
-INSERT INTO inventory_items (item_name, category, quantity_in_stock, unit_price, expiration_date)
-VALUES ('Amoxicillin 500mg', 'Medicine', 150, 12.50, '2027-12-31');
+INSERT INTO inventory_items (item_name, category, quantity_in_stock, unit_price, expiration_date,batch_number)
+VALUES ('Amoxicillin 500mg', 'Medicine', 150, 12.50, '2027-12-31', 'BATCH-882');
