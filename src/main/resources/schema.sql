@@ -70,9 +70,10 @@ CREATE TABLE IF NOT EXISTS room_allocations (
 CREATE TABLE IF NOT EXISTS inventory_items (
                                                item_id BIGINT AUTO_INCREMENT PRIMARY KEY,
                                                item_name VARCHAR(100) NOT NULL,
-    category VARCHAR(50) NOT NULL, -- e.g., 'MEDICINE', 'EQUIPMENT'
+    category VARCHAR(50) NOT NULL,
     quantity_in_stock INT NOT NULL DEFAULT 0,
     unit_price DECIMAL(10,2) NOT NULL,
+    batch_number VARCHAR(50),
     expiration_date DATE
     );
 
