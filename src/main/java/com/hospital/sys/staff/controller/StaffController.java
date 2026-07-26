@@ -31,4 +31,25 @@ public class StaffController {
         return staffService.saveStaff(staff);
     }
 
+    // Get one staff member by ID
+    @GetMapping("/{id}")
+    public Staff getStaffById(@PathVariable Long id) { // This method returns one staff member,
+                                                       // using the ID provided in the URL.
+        return staffService.getStaffById(id);
+    }
+
+    // Update a staff member
+    @PutMapping
+    public Staff updateStaff(@RequestBody Staff staff) { // This method updates an existing staff member.
+                                                         // The updated details are received from the request body.
+        return staffService.updateStaff(staff);
+    }
+
+    // Delete a staff member
+    @DeleteMapping("/{id}")
+    public void deleteStaff(@PathVariable Long id) { // This method deletes a staff member using the ID.
+        staffService.deleteStaff(id);                // @PathVariable: It takes the value from the URL and,
+                                                                    // stores it in the variable id.
+    }
+
 }
