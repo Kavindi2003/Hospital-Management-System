@@ -35,4 +35,28 @@ public class StaffService {
                                                     // -->it performs an UPDATE.
                                             // That's one reason why JpaRepository is so powerful.
     }
+
+    // Get one staff member by ID
+    public Staff getStaffById(Long staffId) {
+        return staffRepository.findById(staffId).orElse(null); // findById() --> staffRepository.findById(staffId)
+                                                                        // Looks for a staff member with the given ID.
+                                                                            // .orElse(null) --> If found → return the Staff.
+                                                                                             // If not found → return null.
+    }
+
+    // Update an existing staff member
+    public Staff updateStaff(Staff staff) {
+        return staffRepository.save(staff); // save() --> staffRepository.save(staff);
+                                                // This method does both:
+                                                        //INSERT (new record)
+                                                        //UPDATE (existing record)
+    }
+
+    // Delete a staff member
+    public void deleteStaff(Long staffId) {
+        staffRepository.deleteById(staffId); // deleteById() --> staffRepository.deleteById(staffId);
+                                                // Equivalent SQL: DELETE FROM staff
+                                                 //                WHERE staff_id = ?;
+    }
+
 }
