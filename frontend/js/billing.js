@@ -17,7 +17,7 @@ async function loadBills() {
                 <td class="status-${bill.paymentStatus}">${bill.paymentStatus}</td>
                 <td>${bill.billingDate}</td>
                 <td>
-                    <button onclick="markAsPaid(${bill.billId}, ${bill.patientId}, ${bill.totalAmount}, '${bill.billingDate}')">Mark Paid</button>
+                    <button onclick="markAsPaid(${bill.billId})">Mark Paid</button>
                     <button class="danger" onclick="deleteBill(${bill.billId})">Delete</button>
                 </td>
             `;
@@ -49,7 +49,7 @@ async function createBill() {
                 patientId: Number(patientId),
                 totalAmount: Number(totalAmount),
                 paymentStatus: paymentStatus,
-                billingDate: billingDate
+                billingDate: billingDate + "T00:00:00"
             })
         });
 
@@ -64,18 +64,13 @@ async function createBill() {
     }
 }
 
-// Mark a bill as paid (update)
-async function markAsPaid(billId, patientId, totalAmount, billingDate) {
+// Mark a bill as paid (partial update — only sends the status field)
+async function markAsPaid(billId) {
     try {
         await fetch(`${API_BASE}/${billId}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                patientId: patientId,
-                totalAmount: totalAmount,
-                paymentStatus: "PAID",
-                billingDate: billingDate
-            })
+            body: JSON.stringify({ paymentStatus: "PAID" })
         });
         loadBills();
     } catch (err) {

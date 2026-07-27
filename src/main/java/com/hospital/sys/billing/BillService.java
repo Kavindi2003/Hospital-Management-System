@@ -26,9 +26,26 @@ public class BillService {
         return billRepository.save(bill);
     }
 
+    // Loads the existing bill first, then only overwrites fields that were
+    // actually provided in the request — avoids wiping other fields to null
     public Bill updateBill(Long id, Bill updatedBill) {
-        updatedBill.setBillId(id);
-        return billRepository.save(updatedBill);
+        Bill existingBill = billRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Bill not found with id: " + id));
+
+        if (updatedBill.getPatientId() != null) {
+            existingBill.setPatientId(updatedBill.getPatientId());
+        }
+        if (updatedBill.getTotalAmount() != null) {
+            existingBill.setTotalAmount(updatedBill.getTotalAmount());
+        }
+        if (updatedBill.getPaymentStatus() != null) {
+            existingBill.setPaymentStatus(updatedBill.getPaymentStatus());
+        }
+        if (updatedBill.getBillingDate() != null) {
+            existingBill.setBillingDate(updatedBill.getBillingDate());
+        }
+
+        return billRepository.save(existingBill);
     }
 
     public void deleteBill(Long id) {

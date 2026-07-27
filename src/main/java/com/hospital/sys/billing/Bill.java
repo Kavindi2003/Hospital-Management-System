@@ -1,7 +1,8 @@
 package com.hospital.sys.billing;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "bills")
@@ -12,19 +13,31 @@ public class Bill {
     @Column(name = "bill_id")
     private Long billId;
 
-    @Column(name = "patient_id")
+    @Column(name = "patient_id", nullable = false)
     private Long patientId;
 
-    @Column(name = "total_amount")
-    private Double totalAmount;
+    @Column(name = "total_amount", nullable = false)
+    private BigDecimal totalAmount;
 
     @Column(name = "payment_status")
     private String paymentStatus;
 
     @Column(name = "billing_date")
-    private LocalDate billingDate;
+    private LocalDateTime billingDate;
 
     public Bill() {
+    }
+
+    // Automatically fills in defaults before the row is first saved,
+    // since Hibernate sends explicit values (even null) and skips the DB's own DEFAULT clauses
+    @PrePersist
+    protected void onCreate() {
+        if (paymentStatus == null) {
+            paymentStatus = "UNPAID";
+        }
+        if (billingDate == null) {
+            billingDate = LocalDateTime.now();
+        }
     }
 
     public Long getBillId() {
@@ -43,11 +56,11 @@ public class Bill {
         this.patientId = patientId;
     }
 
-    public Double getTotalAmount() {
+    public BigDecimal getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(Double totalAmount) {
+    public void setTotalAmount(BigDecimal totalAmount) {
         this.totalAmount = totalAmount;
     }
 
@@ -59,11 +72,11 @@ public class Bill {
         this.paymentStatus = paymentStatus;
     }
 
-    public LocalDate getBillingDate() {
+    public LocalDateTime getBillingDate() {
         return billingDate;
     }
 
-    public void setBillingDate(LocalDate billingDate) {
+    public void setBillingDate(LocalDateTime billingDate) {
         this.billingDate = billingDate;
     }
 }
