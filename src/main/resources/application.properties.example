@@ -1,13 +1,11 @@
 # Server Configuration
 server.port=8080
 
-
 # Database Configuration Template
 spring.datasource.url=jdbc:mysql://localhost:3306/hospital_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
 spring.datasource.username=root
 spring.datasource.password=YOUR_MYSQL_PASSWORD_HERE
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-
 
 # JPA / Hibernate Configuration
 spring.jpa.hibernate.ddl-auto=none
@@ -15,8 +13,8 @@ spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
 
-
-# Database initialization
-# Run schema.sql and data.sql only when required.
-# After initial setup, keep this as never to prevent duplicate inserts.
-spring.sql.init.mode=never
+# spring.sql.init.mode=always was used once to seed the master DB with initial schema.sql/data.sql.
+# IMPORTANT: switch to spring.sql.init.mode=never after that one-time load to prevent
+# auto-increment drift from repeated INSERT IGNORE executions on every startup.
+# Execute schema.sql and data.sql on startup
+spring.sql.init.mode=always
