@@ -1,16 +1,16 @@
 -- Sample Wards
-INSERT IGNORE INTO wards (ward_name, capacity, occupied_beds) VALUES ('Emergency Ward', 20, 0);
-INSERT IGNORE INTO wards (ward_name, capacity, occupied_beds) VALUES ('ICU', 10, 0);
+INSERT INTO wards (ward_name, capacity, occupied_beds) VALUES ('Emergency Ward', 20, 0);
+INSERT INTO wards (ward_name, capacity, occupied_beds) VALUES ('ICU', 10, 0);
 
 -- Insert Patients
 INSERT INTO patients (first_name, last_name, date_of_birth, gender, phone_number, email, address)
 VALUES ('John', 'Doe', '1990-05-15', 'Male', '1234567890', 'john@example.com', '123 Main St');
 
 -- Insert Staff / Doctors
-INSERT IGNORE INTO staff (first_name, last_name, role, specialization, phone_number, email)
+INSERT INTO staff (first_name, last_name, role, specialization, phone_number, email)
 VALUES ('John', 'Doe', 'DOCTOR', 'Cardiology', '1112223333', 'john.doe@hospital.com');
 
-INSERT IGNORE INTO staff (first_name, last_name, role, specialization, phone_number, email)
+INSERT INTO staff (first_name, last_name, role, specialization, phone_number, email)
 VALUES ('Sarah', 'Smith', 'DOCTOR', 'Cardiology', '0987654321', 'dr.smith@hospital.com');
 
 -- Insert Appointments
