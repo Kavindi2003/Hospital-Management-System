@@ -32,7 +32,7 @@ public class MedicalRecordController {
     @GetMapping("/{id}")
     public MedicalRecord getRecordById(@PathVariable Long id) {
         return service.getRecordById(id)
-                .orElseThrow(() -> new RuntimeException("Medical record not found with id: " + id));
+                .orElseThrow(() -> new MedicalRecordNotFoundException(id));
     }
 
     // READ BY PATIENT ID: GET /api/medical-records/patient/{patientId}

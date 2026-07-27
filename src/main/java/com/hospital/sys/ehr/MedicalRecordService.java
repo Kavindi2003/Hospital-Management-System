@@ -45,13 +45,13 @@ public class MedicalRecordService {
                     }
                     return repository.save(existingRecord);
                 })
-                .orElseThrow(() -> new RuntimeException("Medical record not found with id: " + recordId));
+                .orElseThrow(() -> new MedicalRecordNotFoundException(recordId));
     }
 
     // Delete a medical record by ID
     public void deleteRecord(Long recordId) {
         if (!repository.existsById(recordId)) {
-            throw new RuntimeException("Cannot delete. Medical record not found with id: " + recordId);
+            throw new MedicalRecordNotFoundException(recordId);
         }
         repository.deleteById(recordId);
     }
