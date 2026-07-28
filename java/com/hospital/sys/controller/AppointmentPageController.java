@@ -1,4 +1,4 @@
-package com.hospital.sys.controller;
+package com.hospital.sys.appointment.controller;
 
 
 import org.springframework.stereotype.Controller;

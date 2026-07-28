@@ -1,4 +1,4 @@
-package com.hospital.sys.controller;
+package com.hospital.sys.appointment.controller;
 
 
 import com.hospital.sys.entity.Appointment;
