@@ -16,7 +16,7 @@ public class Bill {
     @Column(name = "patient_id", nullable = false)
     private Long patientId;
 
-    @Column(name = "total_amount", nullable = false)
+    @Column(name = "total_amount", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalAmount;
 
     @Column(name = "payment_status")
