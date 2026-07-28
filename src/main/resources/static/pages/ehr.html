@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electronic Health Records | Hospital Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/ehr.css">
+</head>
+<body>
+<div class="app">
+    <header>
+        <div class="brand">
+            <h1>Electronic Health Records</h1>
+            <p>Manage diagnoses and treatment plans via <code>/api/medical-records</code></p>
+            <a href="/index.html" class="back-link">&larr; Back to dashboard</a>
+        </div>
+        <div class="toolbar">
+            <div class="search-group">
+                <input type="number" id="filterRecordId" class="id-filter" placeholder="Record ID" min="1">
+                <button type="button" class="btn btn-ghost" id="btnLookupRecord">Lookup</button>
+                <input type="number" id="filterPatientId" class="id-filter" placeholder="Patient ID" min="1">
+                <button type="button" class="btn btn-ghost" id="btnFilterPatient">By patient</button>
+            </div>
+            <button type="button" class="btn btn-ghost" id="btnRefresh">Refresh all</button>
+            <button type="button" class="btn btn-primary" id="btnNewRecord">+ New record</button>
+        </div>
+    </header>
+
+    <div class="stats">
+        <div class="stat-card">
+            <span>Total records</span>
+            <strong id="statTotal">&mdash;</strong>
+        </div>
+        <div class="stat-card">
+            <span>View</span>
+            <strong id="statView" style="font-size: 1rem; color: var(--text);">All records</strong>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="loading-bar" id="loadingBar" aria-hidden="true"></div>
+        <div class="panel-head">
+            <h2 id="panelTitle">Medical records</h2>
+            <span class="badge" id="apiBadge">GET /api/medical-records</span>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Patient</th>
+                    <th>Doctor</th>
+                    <th>Diagnosis</th>
+                    <th>Treatment</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="recordsBody">
+                </tbody>
+            </table>
+        </div>
+        <div class="empty-state" id="emptyState" hidden>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M9 12h6M9 16h6M7 4h10l2 4v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6l2-4z"/>
+            </svg>
+            <p>No records to show. Create one or adjust your filter.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Create / Edit modal -->
+<div class="overlay" id="formOverlay" role="dialog" aria-modal="true" aria-labelledby="formModalTitle">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="formModalTitle">New medical record</h3>
+        </div>
+        <form id="recordForm">
+            <div class="modal-body">
+                <input type="hidden" id="editRecordId">
+                <div class="field" id="patientField">
+                    <label for="patientId">Patient ID *</label>
+                    <input type="number" id="patientId" name="patientId" min="1" required>
+                </div>
+                <div class="field" id="doctorField">
+                    <label for="doctorId">Doctor ID (staff) *</label>
+                    <input type="number" id="doctorId" name="doctorId" min="1" required>
+                    <p class="hint">Must match an existing staff member in the database.</p>
+                </div>
+                <div class="field">
+                    <label for="diagnosis">Diagnosis *</label>
+                    <textarea id="diagnosis" name="diagnosis" required placeholder="Clinical diagnosis&hellip;"></textarea>
+                </div>
+                <div class="field">
+                    <label for="treatmentPlan">Treatment plan</label>
+                    <textarea id="treatmentPlan" name="treatmentPlan" placeholder="Medication, follow-up, referrals&hellip;"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-ghost" id="btnCancelForm">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="btnSubmitForm">Save record</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- View detail modal -->
+<div class="overlay" id="viewOverlay" role="dialog" aria-modal="true" aria-labelledby="viewModalTitle">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="viewModalTitle">Record details</h3>
+        </div>
+        <div class="modal-body">
+            <dl class="detail-grid" id="viewDetails"></dl>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" id="btnCloseView">Close</button>
+            <button type="button" class="btn btn-primary" id="btnEditFromView">Edit</button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete confirm -->
+<div class="overlay" id="deleteOverlay" role="dialog" aria-modal="true">
+    <div class="modal modal-narrow">
+        <div class="modal-header">
+            <h3>Delete record?</h3>
+        </div>
+        <div class="modal-body">
+            <p style="margin: 0; color: var(--text-muted);">This permanently removes record <strong id="deleteRecordLabel"></strong>. This cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" id="btnCancelDelete">Cancel</button>
+            <button type="button" class="btn btn-danger" id="btnConfirmDelete">Delete</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+<script>
+    const API_BASE = '/api/medical-records';
+
+    const els = {
+        recordsBody: document.getElementById('recordsBody'),
+        emptyState: document.getElementById('emptyState'),
+        loadingBar: document.getElementById('loadingBar'),
+        statTotal: document.getElementById('statTotal'),
+        statView: document.getElementById('statView'),
+        panelTitle: document.getElementById('panelTitle'),
+        apiBadge: document.getElementById('apiBadge'),
+        formOverlay: document.getElementById('formOverlay'),
+        viewOverlay: document.getElementById('viewOverlay'),
+        deleteOverlay: document.getElementById('deleteOverlay'),
+        recordForm: document.getElementById('recordForm'),
+        viewDetails: document.getElementById('viewDetails'),
+        toastContainer: document.getElementById('toastContainer'),
+    };
+
+    let pendingDeleteId = null;
+    let lastViewedRecord = null;
+    let currentRecords = [];
+
+    function setLoading(on) {
+        els.loadingBar.classList.toggle('active', on);
+    }
+
+    function toast(message, type = 'success') {
+        const node = document.createElement('div');
+        node.className = `toast ${type}`;
+        node.textContent = message;
+        els.toastContainer.appendChild(node);
+        setTimeout(() => node.remove(), 4500);
+    }
+
+    async function parseErrorResponse(res) {
+        const text = await res.text();
+        try {
+            const json = JSON.parse(text);
+            return json.message || json.error || text || res.statusText;
+        } catch {
+            return text || res.statusText;
+        }
+    }
+
+    async function api(path, options = {}) {
+        setLoading(true);
+        try {
+            const res = await fetch(API_BASE + path, {
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                ...options,
+            });
+            if (res.status === 204) return null;
+            if (!res.ok) {
+                const msg = await parseErrorResponse(res);
+                throw new Error(msg);
+            }
+            const contentType = res.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+                return res.json();
+            }
+            return null;
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    function formatDate(iso) {
+        if (!iso) return '&mdash;';
+        try {
+            return new Date(iso).toLocaleString(undefined, {
+                dateStyle: 'medium',
+                timeStyle: 'short',
+            });
+        } catch {
+            return iso;
+        }
+    }
+
+    function escapeHtml(str) {
+        if (str == null) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function renderTable(records) {
+        currentRecords = Array.isArray(records) ? records : [records];
+        els.recordsBody.innerHTML = '';
+
+        if (!currentRecords.length) {
+            els.emptyState.hidden = false;
+            els.statTotal.textContent = '0';
+            return;
+        }
+
+        els.emptyState.hidden = true;
+        els.statTotal.textContent = String(currentRecords.length);
+
+        for (const r of currentRecords) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><span class="badge">#${escapeHtml(r.recordId)}</span></td>
+                <td>${escapeHtml(r.patientId)}</td>
+                <td>${escapeHtml(r.doctorId)}</td>
+                <td class="cell-truncate" title="${escapeHtml(r.diagnosis)}">${escapeHtml(r.diagnosis)}</td>
+                <td class="cell-truncate" title="${escapeHtml(r.treatmentPlan || '')}">${escapeHtml(r.treatmentPlan || '&mdash;')}</td>
+                <td>${escapeHtml(formatDate(r.createdAt))}</td>
+                <td>
+                    <div class="row-actions">
+                        <button type="button" class="btn btn-ghost btn-sm" data-action="view" data-id="${r.recordId}">View</button>
+                        <button type="button" class="btn btn-ghost btn-sm" data-action="edit" data-id="${r.recordId}">Edit</button>
+                        <button type="button" class="btn btn-danger btn-sm" data-action="delete" data-id="${r.recordId}">Delete</button>
+                    </div>
+                </td>
+            `;
+            els.recordsBody.appendChild(tr);
+        }
+    }
+
+    function setViewContext(label, badge) {
+        els.statView.textContent = label;
+        els.apiBadge.textContent = badge;
+        els.panelTitle.textContent = label;
+    }
+
+    async function loadAll() {
+        setViewContext('All records', 'GET /api/medical-records');
+        try {
+            const data = await api('');
+            renderTable(data);
+            toast('Loaded all medical records');
+        } catch (e) {
+            toast(e.message, 'error');
+            renderTable([]);
+        }
+    }
+
+    async function loadByPatient(patientId) {
+        setViewContext(`Patient #${patientId}`, `GET /api/medical-records/patient/${patientId}`);
+        try {
+            const data = await api(`/patient/${patientId}`);
+            renderTable(data);
+            toast(`Found ${data.length} record(s) for patient ${patientId}`);
+        } catch (e) {
+            toast(e.message, 'error');
+            renderTable([]);
+        }
+    }
+
+    async function loadByRecordId(id) {
+        setViewContext(`Record #${id}`, `GET /api/medical-records/${id}`);
+        try {
+            const data = await api(`/${id}`);
+            renderTable([data]);
+            toast(`Loaded record #${id}`);
+        } catch (e) {
+            toast(e.message, 'error');
+            renderTable([]);
+        }
+    }
+
+    function openModal(overlay) {
+        overlay.classList.add('open');
+    }
+
+    function closeModal(overlay) {
+        overlay.classList.remove('open');
+    }
+
+    function openCreateForm() {
+        document.getElementById('formModalTitle').textContent = 'New medical record';
+        document.getElementById('editRecordId').value = '';
+        document.getElementById('patientField').hidden = false;
+        document.getElementById('doctorField').hidden = false;
+        document.getElementById('patientId').required = true;
+        document.getElementById('doctorId').required = true;
+        els.recordForm.reset();
+        openModal(els.formOverlay);
+    }
+
+    function openEditForm(record) {
+        document.getElementById('formModalTitle').textContent = `Edit record #${record.recordId}`;
+        document.getElementById('editRecordId').value = record.recordId;
+        document.getElementById('patientId').value = record.patientId;
+        document.getElementById('doctorId').value = record.doctorId;
+        document.getElementById('diagnosis').value = record.diagnosis || '';
+        document.getElementById('treatmentPlan').value = record.treatmentPlan || '';
+        document.getElementById('patientField').hidden = true;
+        document.getElementById('doctorField').hidden = false;
+        document.getElementById('patientId').required = false;
+        document.getElementById('doctorId').required = false;
+        openModal(els.formOverlay);
+    }
+
+    function showRecordDetails(record) {
+        lastViewedRecord = record;
+        document.getElementById('viewModalTitle').textContent = `Record #${record.recordId}`;
+        els.viewDetails.innerHTML = `
+            <div><dt>Record ID</dt><dd>${escapeHtml(record.recordId)}</dd></div>
+            <div><dt>Patient ID</dt><dd>${escapeHtml(record.patientId)}</dd></div>
+            <div><dt>Doctor ID</dt><dd>${escapeHtml(record.doctorId)}</dd></div>
+            <div><dt>Diagnosis</dt><dd>${escapeHtml(record.diagnosis)}</dd></div>
+            <div><dt>Treatment plan</dt><dd>${escapeHtml(record.treatmentPlan || '&mdash;')}</dd></div>
+            <div><dt>Created at</dt><dd>${escapeHtml(formatDate(record.createdAt))}</dd></div>
+        `;
+        openModal(els.viewOverlay);
+    }
+
+    function findRecordById(id) {
+        return currentRecords.find(r => String(r.recordId) === String(id));
+    }
+
+    els.recordsBody.addEventListener('click', async (e) => {
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
+        const id = btn.dataset.id;
+        const action = btn.dataset.action;
+        let record = findRecordById(id);
+
+        if (action === 'view') {
+            if (!record) {
+                try {
+                    record = await api(`/${id}`);
+                } catch (err) {
+                    toast(err.message, 'error');
+                    return;
+                }
+            }
+            showRecordDetails(record);
+            return;
+        }
+
+        if (action === 'edit') {
+            if (!record) {
+                try {
+                    record = await api(`/${id}`);
+                } catch (err) {
+                    toast(err.message, 'error');
+                    return;
+                }
+            }
+            openEditForm(record);
+            return;
+        }
+
+        if (action === 'delete') {
+            pendingDeleteId = id;
+            document.getElementById('deleteRecordLabel').textContent = `#${id}`;
+            openModal(els.deleteOverlay);
+        }
+    });
+
+    els.recordForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const editId = document.getElementById('editRecordId').value;
+        const diagnosis = document.getElementById('diagnosis').value.trim();
+        const treatmentPlan = document.getElementById('treatmentPlan').value.trim();
+
+        if (!diagnosis) {
+            toast('Diagnosis is required', 'error');
+            return;
+        }
+
+        try {
+            if (editId) {
+                const body = {
+                    diagnosis,
+                    treatmentPlan: treatmentPlan || null,
+                };
+                const doctorId = document.getElementById('doctorId').value;
+                if (doctorId) body.doctorId = Number(doctorId);
+
+                await api(`/${editId}`, { method: 'PUT', body: JSON.stringify(body) });
+                toast(`Record #${editId} updated`);
+            } else {
+                const body = {
+                    patientId: Number(document.getElementById('patientId').value),
+                    doctorId: Number(document.getElementById('doctorId').value),
+                    diagnosis,
+                    treatmentPlan: treatmentPlan || null,
+                };
+                await api('', { method: 'POST', body: JSON.stringify(body) });
+                toast('Record created', 'success');
+            }
+            closeModal(els.formOverlay);
+            await loadAll();
+        } catch (err) {
+            toast(err.message, 'error');
+        }
+    });
+
+    document.getElementById('btnConfirmDelete').addEventListener('click', async () => {
+        if (!pendingDeleteId) return;
+        try {
+            await api(`/${pendingDeleteId}`, { method: 'DELETE' });
+            toast(`Record #${pendingDeleteId} deleted`);
+            closeModal(els.deleteOverlay);
+            pendingDeleteId = null;
+            await loadAll();
+        } catch (err) {
+            toast(err.message, 'error');
+        }
+    });
+
+    document.getElementById('btnNewRecord').addEventListener('click', openCreateForm);
+    document.getElementById('btnRefresh').addEventListener('click', loadAll);
+    document.getElementById('btnCancelForm').addEventListener('click', () => closeModal(els.formOverlay));
+    document.getElementById('btnCloseView').addEventListener('click', () => closeModal(els.viewOverlay));
+    document.getElementById('btnCancelDelete').addEventListener('click', () => {
+        pendingDeleteId = null;
+        closeModal(els.deleteOverlay);
+    });
+
+    document.getElementById('btnEditFromView').addEventListener('click', () => {
+        closeModal(els.viewOverlay);
+        if (lastViewedRecord) openEditForm(lastViewedRecord);
+    });
+
+    document.getElementById('btnLookupRecord').addEventListener('click', () => {
+        const id = document.getElementById('filterRecordId').value;
+        if (!id) {
+            toast('Enter a record ID', 'error');
+            return;
+        }
+        loadByRecordId(id);
+    });
+
+    document.getElementById('btnFilterPatient').addEventListener('click', () => {
+        const pid = document.getElementById('filterPatientId').value;
+        if (!pid) {
+            toast('Enter a patient ID', 'error');
+            return;
+        }
+        loadByPatient(pid);
+    });
+
+    [els.formOverlay, els.viewOverlay, els.deleteOverlay].forEach(overlay => {
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) closeModal(overlay);
+        });
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
+        closeModal(els.formOverlay);
+        closeModal(els.viewOverlay);
+        closeModal(els.deleteOverlay);
+    });
+
+    loadAll();
+</script>
+</body>
+</html>
