@@ -22,19 +22,22 @@ public class Staff {
     @Column(name = "staff_id")
     private Long staffId;
 
-    @Column(name = "first_name")
+    @Column(name = "first_name", nullable = false, length = 50)
     private String firstName;
 
-    @Column(name = "last_name")
+    @Column(name = "last_name", nullable = false, length = 50)
     private String lastName;
 
+    @Column(nullable = false, length = 30)
     private String role;
 
+    @Column(length = 50)
     private String specialization;
 
-    @Column(name = "phone_number")
+    @Column(name = "phone_number", length = 15)
     private String phoneNumber;
 
+    @Column(nullable = false, unique = true, length = 100)
     private String email;
 }
 
