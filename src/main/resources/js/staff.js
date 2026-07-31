@@ -1,4 +1,5 @@
 const API_URL = "http://localhost:8080/staff";
+let allStaff = []; //This variable will always keep a copy of all staff records.
 
 // ===============================
 // Load data when page opens
@@ -20,9 +21,9 @@ async function loadStaff() {
 
         const response = await fetch(API_URL);
 
-        const staffList = await response.json();
+        allStaff = await response.json(); // every time data is loaded, it's stored in allStaff.
 
-        displayStaff(staffList);
+        displayStaff(allStaff);
 
     } catch (error) {
 
@@ -84,9 +85,10 @@ function displayStaff(staffList) {
 
 }
 
-// ===============================
+
 // Placeholder functions
-// (We'll implement these next.)
+// ===============================
+// Edid Staff
 // ===============================
 
 async function editStaff(id) {
@@ -115,6 +117,10 @@ async function editStaff(id) {
     }
 
 }
+
+// ===============================
+// Delete Staff
+// ===============================
 
 async function deleteStaff(id) {
 
@@ -218,5 +224,30 @@ async function saveStaff(event) {
         alert("Error while saving staff.");
 
     }
+
+}
+
+// ===============================
+// Search Staff
+// ===============================
+
+document.getElementById("searchInput").addEventListener("input", searchStaff);
+
+function searchStaff() {
+
+    const keyword = document
+        .getElementById("searchInput")
+        .value
+        .toLowerCase();
+
+    const filteredStaff = allStaff.filter(staff =>
+
+        staff.firstName.toLowerCase().includes(keyword) ||
+        staff.lastName.toLowerCase().includes(keyword) ||
+        staff.role.toLowerCase().includes(keyword)
+
+    );
+
+    displayStaff(filteredStaff);
 
 }
