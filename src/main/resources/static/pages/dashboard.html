@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Hospital Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/index.css">
+</head>
+<body>
+<div class="app">
+    <header>
+        <div class="brand">
+            <h1>Hospital Management System</h1>
+            <p>Logged in as <code id="whoami">&hellip;</code></p>
+        </div>
+        <form action="/logout" method="POST">
+            <button type="submit" class="btn btn-ghost">Log out</button>
+        </form>
+    </header>
+
+    <div class="section-label">Your modules</div>
+    <div class="module-grid" id="moduleGrid"></div>
+</div>
+
+<script>
+    // Every module a role could see. `roles` lists who gets a card for it --
+    // ADMIN implicitly gets everything, so it's left out of each list below
+    // and handled as a special case in render().
+    const MODULES = [
+        { name: 'Patients',   desc: 'Patient records and intake details.',            href: '/pages/patient.html',     roles: ['DOCTOR', 'NURSE', 'RECEPTIONIST'] },
+        { name: 'Appointments', desc: 'Scheduling between patients and doctors.',      href: '/pages/appointment.html', roles: ['DOCTOR', 'RECEPTIONIST'] },
+        { name: 'Medical Records', desc: 'Diagnoses and treatment plans.',             href: '/pages/ehr.html',         roles: ['DOCTOR'] },
+        { name: 'Wards & Rooms', desc: 'Ward capacity and bed allocation.',             href: '/pages/ward.html',        roles: ['NURSE'] },
+        { name: 'Pharmacy Inventory', desc: 'Medicine stock and batch tracking.',       href: '/pages/inventory.html',   roles: ['NURSE'] },
+        { name: 'Billing', desc: 'Patient invoices and payment status.',               href: '/pages/billing.html',     roles: ['RECEPTIONIST'] },
+        { name: 'Staff', desc: 'Doctors, nurses, and support staff.',                   href: '/pages/staff.html',       roles: [] }, // admin-only
+    ];
+
+    function escapeHtml(str) {
+        if (str == null) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function render(username, role) {
+        document.getElementById('whoami').textContent = `${username} (${role})`;
+
+        const grid = document.getElementById('moduleGrid');
+        const visible = MODULES.filter(m => role === 'ADMIN' || m.roles.includes(role));
+
+        if (!visible.length) {
+            grid.innerHTML = '<p style="color: var(--text-muted);">No modules assigned to your role yet.</p>';
+            return;
+        }
+
+        grid.innerHTML = visible.map(m => `
+            <a href="${m.href}" class="module-card">
+                <h3>${escapeHtml(m.name)}</h3>
+                <p>${escapeHtml(m.desc)}</p>
+            </a>
+        `).join('');
+    }
+
+    fetch('/api/auth/me')
+        .then(res => {
+            if (!res.ok) throw new Error('Not logged in');
+            return res.json();
+        })
+        .then(user => render(user.username, user.role))
+        .catch(() => { window.location.href = '/login.html'; });
+</script>
+</body>
+</html>
