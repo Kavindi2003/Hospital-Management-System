@@ -100,3 +100,62 @@ function deleteStaff(id) {
     console.log("Delete Staff:", id);
 
 }
+
+// ===============================
+// Save Staff
+// ===============================
+
+document.getElementById("staffForm").addEventListener("submit", saveStaff);
+
+async function saveStaff(event) {
+
+    event.preventDefault();
+
+    const staff = {
+
+        firstName: document.getElementById("firstName").value,
+        lastName: document.getElementById("lastName").value,
+        role: document.getElementById("role").value,
+        specialization: document.getElementById("specialization").value,
+        phoneNumber: document.getElementById("phoneNumber").value,
+        email: document.getElementById("email").value
+
+    };
+
+    try {
+
+        const response = await fetch(API_URL, {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(staff)
+
+        });
+
+        if(response.ok){
+
+            alert("Staff added successfully!");
+
+            document.getElementById("staffForm").reset();
+
+            loadStaff();
+
+        }else{
+
+            alert("Failed to add staff.");
+
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Error while saving staff.");
+
+    }
+
+}
