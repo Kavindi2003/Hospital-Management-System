@@ -116,9 +116,41 @@ async function editStaff(id) {
 
 }
 
-function deleteStaff(id) {
+async function deleteStaff(id) {
 
-    console.log("Delete Staff:", id);
+    const confirmDelete = confirm("Are you sure you want to delete this staff member?");
+
+    if (!confirmDelete) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch(`${API_URL}/${id}`, {
+
+            method: "DELETE"
+
+        });
+
+        if (response.ok) {
+
+            alert("Staff deleted successfully!");
+
+            loadStaff();
+
+        } else {
+
+            alert("Failed to delete staff.");
+
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Error while deleting staff.");
+
+    }
 
 }
 
