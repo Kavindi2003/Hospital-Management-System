@@ -89,9 +89,30 @@ function displayStaff(staffList) {
 // (We'll implement these next.)
 // ===============================
 
-function editStaff(id) {
+async function editStaff(id) {
 
-    console.log("Edit Staff:", id);
+    try {
+
+        const response = await fetch(`${API_URL}/${id}`);
+
+        const staff = await response.json();
+
+        document.getElementById("staffId").value = staff.staffId;
+        document.getElementById("firstName").value = staff.firstName;
+        document.getElementById("lastName").value = staff.lastName;
+        document.getElementById("role").value = staff.role;
+        document.getElementById("specialization").value = staff.specialization;
+        document.getElementById("phoneNumber").value = staff.phoneNumber;
+        document.getElementById("email").value = staff.email;
+
+        document.getElementById("saveBtn").textContent = "Update Staff";
+
+    } catch (error) {
+
+        console.error(error);
+        alert("Unable to load staff details.");
+
+    }
 
 }
 
@@ -113,6 +134,8 @@ async function saveStaff(event) {
 
     const staff = {
 
+        staffId: document.getElementById("staffId").value,
+
         firstName: document.getElementById("firstName").value,
         lastName: document.getElementById("lastName").value,
         role: document.getElementById("role").value,
@@ -124,9 +147,11 @@ async function saveStaff(event) {
 
     try {
 
+        const isUpdate = staff.staffId !== "";
+
         const response = await fetch(API_URL, {
 
-            method: "POST",
+            method: isUpdate ? "PUT" : "POST",
 
             headers: {
                 "Content-Type": "application/json"
@@ -141,6 +166,10 @@ async function saveStaff(event) {
             alert("Staff added successfully!");
 
             document.getElementById("staffForm").reset();
+
+            document.getElementById("staffId").value = "";
+
+            document.getElementById("saveBtn").textContent = "Save Staff";
 
             loadStaff();
 
