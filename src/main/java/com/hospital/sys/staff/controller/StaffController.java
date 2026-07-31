@@ -6,6 +6,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:63342") // Allows requests coming from http://localhost:63342
+                                                 // to access this controller.
+                                                 // bcz,
+                                                        // Frontend: http://localhost:63342 (your staff.html page)
+                                                        // Backend: http://localhost:8080 (Spring Boot)
 @RestController // Means: "This class handles web requests."
 @RequestMapping("/staff") // Every method inside this class starts with --> /staff
 
