@@ -2,70 +2,66 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Billing & Invoicing - Hospital Management System</title>
-    <link rel="stylesheet" href="../css/styles.css">
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background: #f4f6f8; }
-        h1 { color: #2c3e50; }
-        .form-section, .table-section {
-            background: white; padding: 20px; border-radius: 8px;
-            margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-        }
-        input, select {
-            padding: 8px; margin: 5px 5px 5px 0; border: 1px solid #ccc; border-radius: 4px;
-        }
-        button {
-            padding: 8px 16px; background: #2980b9; color: white;
-            border: none; border-radius: 4px; cursor: pointer;
-        }
-        button:hover { background: #1f6690; }
-        button.danger { background: #c0392b; }
-        button.danger:hover { background: #922b21; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background: #ecf0f1; }
-        .status-PAID { color: green; font-weight: bold; }
-        .status-UNPAID { color: #c0392b; font-weight: bold; }
-        .status-PARTIAL { color: #d68910; font-weight: bold; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing & Invoicing | Hospital Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/billing.css">
 </head>
 <body>
+<div class="app">
+    <header>
+        <div class="brand">
+            <h1>Billing &amp; Invoicing</h1>
+            <p>Patient invoices and payment status. <code>/api/bills</code></p>
+            <a href="/pages/dashboard.html" class="back-link">&larr; Back to dashboard</a>
+        </div>
+    </header>
 
-<h1>💳 Billing & Invoicing</h1>
+    <div class="form-panel-wrap">
+        <div class="panel-head">
+            <h2>Create New Bill</h2>
+        </div>
+        <div class="form-body">
+            <input type="number" id="patientId" placeholder="Patient ID">
+            <input type="number" id="totalAmount" placeholder="Total Amount" step="0.01">
+            <select id="paymentStatus">
+                <option value="UNPAID">UNPAID</option>
+                <option value="PARTIAL">PARTIAL</option>
+                <option value="PAID">PAID</option>
+            </select>
+            <input type="date" id="billingDate">
+            <button class="btn btn-primary" onclick="createBill()">Create Bill</button>
+        </div>
+    </div>
 
-<div class="form-section">
-    <h2>Create New Bill</h2>
-    <input type="number" id="patientId" placeholder="Patient ID">
-    <input type="number" id="totalAmount" placeholder="Total Amount" step="0.01">
-    <select id="paymentStatus">
-        <option value="UNPAID">UNPAID</option>
-        <option value="PARTIAL">PARTIAL</option>
-        <option value="PAID">PAID</option>
-    </select>
-    <input type="date" id="billingDate">
-    <button onclick="createBill()">Create Bill</button>
+    <div class="panel">
+        <div class="panel-head">
+            <h2>All Bills</h2>
+            <button class="btn btn-ghost" onclick="loadBills()">Refresh</button>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>Bill ID</th>
+                    <th>Patient ID</th>
+                    <th>Total Amount</th>
+                    <th>Status</th>
+                    <th>Billing Date</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="billsTableBody">
+                <!-- rows inserted by JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
-<div class="table-section">
-    <h2>All Bills</h2>
-    <button onclick="loadBills()">🔄 Refresh</button>
-    <table>
-        <thead>
-        <tr>
-            <th>Bill ID</th>
-            <th>Patient ID</th>
-            <th>Total Amount</th>
-            <th>Status</th>
-            <th>Billing Date</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody id="billsTableBody">
-        <!-- rows inserted by JS -->
-        </tbody>
-    </table>
-</div>
-
-<script src="../js/billing.js"></script>
+<script src="/js/billing.js"></script>
 </body>
-</html
+</html>

@@ -1,26 +1,32 @@
 /* ==========================================================================
    Hospital Management System — shared stylesheet
    Fonts: Instrument Serif (display) + DM Sans (body/UI)
-   Palette: deep slate surface, teal accent, coral danger
+   Palette: clean clinical light surface, deep teal accent, warm red danger
+   -- this palette matches what the Appointment/Staff/Ward modules already
+   established independently (#F3F6F5 / #12786A / #1B2A28 / #5B6B68 /
+   #DCE3E1); this file adopts the same values as CSS variables so every
+   page that reads var(--accent) etc. now renders the same light system.
    Applies to every page under /static — always link with an ABSOLUTE path:
-   <link rel="stylesheet" href="/styles.css">
+   <link rel="stylesheet" href="/css/styles.css">
    ========================================================================== */
 
 :root {
-    --bg: #0f1419;
-    --surface: #1a2332;
-    --surface-elevated: #243044;
-    --border: rgba(148, 163, 184, 0.12);
-    --text: #f1f5f9;
-    --text-muted: #94a3b8;
-    --accent: #2dd4bf;
-    --accent-dim: rgba(45, 212, 191, 0.15);
-    --accent-hover: #5eead4;
-    --danger: #f87171;
-    --danger-dim: rgba(248, 113, 113, 0.15);
-    --warning: #fbbf24;
+    --bg: #F3F6F5;
+    --surface: #FFFFFF;
+    --surface-elevated: #F7FAF9;
+    --border: #DCE3E1;
+    --text: #1B2A28;
+    --text-muted: #5B6B68;
+    --accent: #12786A;
+    --accent-dim: rgba(18, 120, 106, 0.10);
+    --accent-hover: #0E5F54;
+    --neutral-dim: rgba(91, 107, 104, 0.12);
+    --danger: #C0392B;
+    --danger-dim: rgba(192, 57, 43, 0.10);
+    --warning: #B7791F;
+    --warning-dim: rgba(183, 121, 31, 0.12);
     --radius: 14px;
-    --shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+    --shadow: 0 24px 48px rgba(20, 40, 38, 0.12);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -34,13 +40,15 @@ body {
     line-height: 1.5;
 }
 
+/* A very quiet ambient tint -- deliberately subtle on a light background,
+   unlike the bolder glow this file used under the old dark theme. */
 body::before {
     content: "";
     position: fixed;
     inset: 0;
     background:
-            radial-gradient(ellipse 80% 50% at 20% -10%, rgba(45, 212, 191, 0.12), transparent),
-            radial-gradient(ellipse 60% 40% at 100% 0%, rgba(56, 189, 248, 0.08), transparent);
+            radial-gradient(ellipse 80% 50% at 20% -10%, rgba(18, 120, 106, 0.06), transparent),
+            radial-gradient(ellipse 60% 40% at 100% 0%, rgba(18, 120, 106, 0.04), transparent);
     pointer-events: none;
     z-index: 0;
 }
@@ -87,7 +95,7 @@ header {
 }
 
 .brand p code {
-    color: var(--accent);
+    color: var(--accent-hover);
     font-size: 0.85em;
     background: var(--accent-dim);
     padding: 0.1em 0.4em;
@@ -101,6 +109,23 @@ header {
 }
 
 .brand a.back-link:hover { text-decoration: underline; }
+
+/* ---------- Module eyebrow ---------- */
+.module-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-dim);
+    border: 1px solid rgba(18, 120, 106, 0.25);
+    border-radius: 999px;
+    padding: 0.25rem 0.7rem;
+    margin-bottom: 0.6rem;
+}
 
 .toolbar {
     display: flex;
@@ -120,6 +145,10 @@ header {
 input[type="number"],
 input[type="text"],
 input[type="email"],
+input[type="password"],
+input[type="date"],
+input[type="datetime-local"],
+select,
 textarea {
     font: inherit;
     background: var(--surface);
@@ -130,13 +159,13 @@ textarea {
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-input:focus, textarea:focus {
+input:focus, select:focus, textarea:focus {
     outline: none;
-    border-color: rgba(45, 212, 191, 0.5);
+    border-color: var(--accent);
     box-shadow: 0 0 0 3px var(--accent-dim);
 }
 
-input::placeholder, textarea::placeholder { color: #64748b; }
+input::placeholder, textarea::placeholder { color: #94a3a0; }
 
 textarea {
     resize: vertical;
@@ -172,28 +201,29 @@ label {
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .btn-primary {
-    background: linear-gradient(135deg, #14b8a6, #0d9488);
-    color: #042f2e;
+    background: var(--accent);
+    color: #FFFFFF;
 }
 
-.btn-primary:hover:not(:disabled) { background: linear-gradient(135deg, var(--accent-hover), #14b8a6); }
+.btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
 
 .btn-ghost {
-    background: var(--surface-elevated);
+    background: var(--neutral-dim);
     color: var(--text);
     border: 1px solid var(--border);
 }
 
-.btn-ghost:hover:not(:disabled) { background: #2d3a50; }
+.btn-ghost:hover:not(:disabled) { background: rgba(91, 107, 104, 0.2); }
 
 .btn-danger {
     background: var(--danger-dim);
     color: var(--danger);
-    border: 1px solid rgba(248, 113, 113, 0.25);
+    border: 1px solid rgba(192, 57, 43, 0.25);
 }
 
-.btn-danger:hover:not(:disabled) { background: rgba(248, 113, 113, 0.25); }
+.btn-danger:hover:not(:disabled) { background: rgba(192, 57, 43, 0.2); }
 
+.btn-large { padding: 0.85rem 1.6rem; font-size: 1rem; }
 .btn-sm { padding: 0.4rem 0.75rem; font-size: 0.8125rem; }
 
 /* ---------- Stat cards ---------- */
@@ -245,7 +275,7 @@ label {
     gap: 0.75rem;
     padding: 1rem 1.25rem;
     border-bottom: 1px solid var(--border);
-    background: rgba(0, 0, 0, 0.15);
+    background: var(--surface-elevated);
 }
 
 .panel-head h2 { margin: 0; font-size: 1rem; font-weight: 600; }
@@ -271,11 +301,11 @@ th {
     letter-spacing: 0.05em;
     color: var(--text-muted);
     font-weight: 600;
-    background: rgba(0, 0, 0, 0.12);
+    background: var(--surface-elevated);
 }
 
 tr:last-child td { border-bottom: none; }
-tr:hover td { background: rgba(45, 212, 191, 0.04); }
+tr:hover td { background: var(--accent-dim); }
 
 .cell-truncate {
     max-width: 220px;
@@ -291,11 +321,11 @@ tr:hover td { background: rgba(45, 212, 191, 0.04); }
     padding: 0.2rem 0.55rem;
     border-radius: 999px;
     background: var(--accent-dim);
-    color: var(--accent);
+    color: var(--accent-hover);
 }
 
 .badge-muted {
-    background: rgba(148, 163, 184, 0.12);
+    background: var(--neutral-dim);
     color: var(--text-muted);
 }
 
@@ -305,7 +335,7 @@ tr:hover td { background: rgba(45, 212, 191, 0.04); }
     color: var(--text-muted);
 }
 
-.empty-state svg { opacity: 0.4; margin-bottom: 0.75rem; }
+.empty-state svg { opacity: 0.5; margin-bottom: 0.75rem; }
 
 .row-actions { display: flex; gap: 0.35rem; flex-wrap: wrap; }
 
@@ -314,7 +344,7 @@ tr:hover td { background: rgba(45, 212, 191, 0.04); }
 .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.65);
+    background: rgba(27, 42, 40, 0.45);
     backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
@@ -329,7 +359,7 @@ tr:hover td { background: rgba(45, 212, 191, 0.04); }
 .overlay.open { opacity: 1; visibility: visible; }
 
 .modal {
-    background: var(--surface-elevated);
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: calc(var(--radius) + 4px);
     width: 100%;
@@ -353,7 +383,7 @@ tr:hover td { background: rgba(45, 212, 191, 0.04); }
     gap: 1rem;
 }
 
-.field .hint { font-size: 0.75rem; color: #64748b; margin-top: 0.25rem; }
+.field .hint { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
 
 .modal-footer {
     padding: 1rem 1.5rem 1.25rem;
@@ -374,6 +404,8 @@ tr:hover td { background: rgba(45, 212, 191, 0.04); }
 
 .detail-grid dd { margin: 0.15rem 0 0; }
 
+.modal-narrow { max-width: 400px; }
+
 /* ---------- Toast ---------- */
 
 .toast-container {
@@ -392,13 +424,13 @@ tr:hover td { background: rgba(45, 212, 191, 0.04); }
     border-radius: 10px;
     font-size: 0.875rem;
     border: 1px solid var(--border);
-    background: var(--surface-elevated);
+    background: var(--surface);
     box-shadow: var(--shadow);
     animation: slideIn 0.3s ease;
 }
 
-.toast.error { border-color: rgba(248, 113, 113, 0.35); background: #2a1f1f; }
-.toast.success { border-color: rgba(45, 212, 191, 0.35); background: #152824; }
+.toast.error { border-color: rgba(192, 57, 43, 0.3); background: #FDF1EF; color: var(--danger); }
+.toast.success { border-color: rgba(18, 120, 106, 0.3); background: #EFF7F5; color: var(--accent-hover); }
 
 @keyframes slideIn {
     from { transform: translateX(100%); opacity: 0; }
@@ -431,25 +463,24 @@ tr:hover td { background: rgba(45, 212, 191, 0.04); }
     100% { transform: translateX(350%); }
 }
 
-/* ---------- Alerts ---------- */
+/* ---------- Alerts (login page, dashboard admin panel) ---------- */
 
 .alert {
     font-size: 0.8125rem;
     padding: 0.65rem 0.85rem;
     border-radius: 10px;
-    margin-bottom: 1rem;
 }
 
 .alert-error {
-    background: var(--danger-dim);
+    background: #FDF1EF;
     color: var(--danger);
-    border: 1px solid rgba(248, 113, 113, 0.25);
+    border: 1px solid rgba(192, 57, 43, 0.25);
 }
 
 .alert-success {
-    background: var(--accent-dim);
-    color: var(--accent);
-    border: 1px solid rgba(45, 212, 191, 0.25);
+    background: #EFF7F5;
+    color: var(--accent-hover);
+    border: 1px solid rgba(18, 120, 106, 0.25);
 }
 
 /* ---------- Footer ---------- */

@@ -1,6 +1,6 @@
 /* ==========================================================================
-   index.html — public landing page only
-   Loaded in addition to the shared /styles.css
+   landing.html — public landing page only
+   Loaded in addition to the shared /css/styles.css
    ========================================================================== */
 
 .landing-nav {
@@ -51,11 +51,6 @@
     margin: 0 0 2rem;
 }
 
-.hero .btn-large {
-    font-size: 1rem;
-    padding: 0.9rem 1.75rem;
-}
-
 .hero-art {
     position: relative;
     aspect-ratio: 1 / 0.82;
@@ -66,6 +61,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: var(--shadow);
 }
 
 .hero-art::before {
@@ -73,11 +69,18 @@
     position: absolute;
     inset: 0;
     background:
-            radial-gradient(ellipse 60% 50% at 30% 20%, rgba(45, 212, 191, 0.18), transparent),
-            radial-gradient(ellipse 50% 40% at 80% 80%, rgba(56, 189, 248, 0.12), transparent);
+            radial-gradient(ellipse 60% 50% at 30% 20%, var(--accent-dim), transparent),
+            radial-gradient(ellipse 50% 40% at 80% 80%, rgba(18, 120, 106, 0.06), transparent);
 }
 
 .hero-art svg { position: relative; z-index: 1; width: 78%; height: auto; }
+
+footer {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    padding: 2rem 0 3rem;
+}
 
 @media (max-width: 880px) {
     .hero { grid-template-columns: 1fr; padding: 2.5rem 1.5rem 3rem; }

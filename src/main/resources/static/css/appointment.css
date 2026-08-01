@@ -1,167 +1,131 @@
 /* ===========================
-   GENERAL
+   Appointment Scheduling — reskinned to match the shared
+   hospital light/teal palette (styles.css tokens, hardcoded
+   here since this page uses Bootstrap rather than styles.css)
 =========================== */
 
 body{
-    background:#eef4fb;
-    font-family:Segoe UI,Arial,sans-serif;
+    background:#F3F6F5;
+    font-family:'DM Sans', 'Segoe UI', Arial, sans-serif;
+    color:#1B2A28;
 }
 
-/* ===========================
-   CARD
-=========================== */
+/* CARD */
 
 .card{
     border:none;
     border-radius:15px;
+    box-shadow: 0 8px 24px rgba(20,40,38,0.08);
 }
 
 .card-header{
     border-radius:15px 15px 0 0 !important;
+    background:#12786A !important;
 }
 
 .card-header h2{
-    font-weight:bold;
+    font-weight:400;
+    font-family: "Instrument Serif", Georgia, serif;
+    font-size: 1.8rem;
 }
 
-/* ===========================
-   FORM
-=========================== */
+/* FORM */
 
 label{
     font-weight:600;
+    color:#5B6B68;
 }
 
 .form-control{
-
     border-radius:8px;
-
+    border-color:#DCE3E1;
     transition:0.3s;
-
 }
 
 .form-control:focus{
-
-    border-color:#0d6efd;
-
-    box-shadow:0 0 8px rgba(13,110,253,.25);
-
+    border-color:#12786A;
+    box-shadow:0 0 0 3px rgba(18,120,106,.15);
 }
 
-/* ===========================
-   BUTTONS
-=========================== */
+/* BUTTONS - reskin Bootstrap's default palette to match the shared teal */
 
 .btn{
-
     border-radius:8px;
-
     font-weight:600;
-
 }
 
+.btn-primary{
+    background-color:#12786A;
+    border-color:#12786A;
+}
 .btn-primary:hover{
-
+    background-color:#0E5F54;
+    border-color:#0E5F54;
     transform:scale(1.02);
-
 }
 
+.btn-success{
+    background-color:#12786A;
+    border-color:#12786A;
+}
 .btn-success:hover{
-
+    background-color:#0E5F54;
+    border-color:#0E5F54;
     transform:scale(1.02);
-
 }
 
 .btn-danger:hover{
-
     transform:scale(1.02);
-
 }
 
+.btn-secondary{
+    background-color:#5B6B68;
+    border-color:#5B6B68;
+}
 .btn-secondary:hover{
-
+    background-color:#465350;
+    border-color:#465350;
     transform:scale(1.02);
-
 }
 
-/* ===========================
-   TABLE
-=========================== */
+/* TABLE */
 
 .table{
-
     margin-top:10px;
-
     border-radius:10px;
-
     overflow:hidden;
-
 }
 
 .table thead{
-
-    background:#0d6efd;
-
+    background:#12786A;
     color:white;
-
 }
 
 .table thead th{
-
     text-align:center;
-
     vertical-align:middle;
-
 }
 
 .table tbody td{
-
     text-align:center;
-
     vertical-align:middle;
-
 }
 
 .table tbody tr:hover{
-
-    background:#eaf4ff;
-
+    background:rgba(18,120,106,0.06);
     transition:.3s;
-
 }
 
-/* ===========================
-   SEARCH
-=========================== */
+/* SEARCH */
 
 #searchBox{
-
     border-radius:8px;
-
 }
 
-/* ===========================
-   RESPONSIVE
-=========================== */
+/* RESPONSIVE */
 
 @media(max-width:768px){
-
-    .card{
-
-        margin:10px;
-
-    }
-
-    .table{
-
-        font-size:14px;
-
-    }
-
-    h2{
-
-        font-size:22px;
-
-    }
-
+    .card{ margin:10px; }
+    .table{ font-size:14px; }
+    h2{ font-size:22px; }
 }

@@ -3,8 +3,8 @@ INSERT IGNORE INTO wards (ward_name, capacity, occupied_beds) VALUES ('Emergency
 INSERT IGNORE INTO wards (ward_name, capacity, occupied_beds) VALUES ('ICU', 10, 0);
 
 -- Insert Patients
-INSERT IGNORE INTO patients (first_name, last_name, date_of_birth, gender, phone_number, email, address)
-VALUES ('John', 'Doe', '1990-05-15', 'Male', '1234567890', 'john@example.com', '123 Main St');
+INSERT IGNORE INTO patients (first_name, last_name, date_of_birth, age, gender, blood_group, phone_number, email, address)
+VALUES ('John', 'Doe', '1990-05-15','35', 'Male','O-', '1234567890', 'john@example.com', '123 Main St');
 
 -- Insert Appointments
 INSERT IGNORE INTO appointments (patient_id, doctor_id, appointment_date, reason)
