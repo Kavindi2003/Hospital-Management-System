@@ -89,11 +89,12 @@ CREATE TABLE IF NOT EXISTS bills (
 
 -- Users table (login accounts) — added for authentication/authorization.
 -- staff_id links a login account to a row in the staff table, so the system
--- can answer "which doctor is this logged-in user" for scoping their view
--- of medical records to only their own patients.
+-- can answer "which staff member is this logged-in user" -- e.g. for
+-- scoping a doctor's view of medical records to only their own patients.
 --
--- Nullable: only DOCTOR accounts need this link today (ADMIN/NURSE/
--- RECEPTIONIST accounts leave it NULL).
+-- DOCTOR/NURSE/RECEPTIONIST accounts are all linked to a real staff row;
+-- ADMIN is the only role left NULL, since it's a system account with no
+-- corresponding staff member.
 --
 -- ON DELETE SET NULL (not CASCADE): if a staff member is ever removed from
 -- the staff table, their login account should NOT be deleted along with
