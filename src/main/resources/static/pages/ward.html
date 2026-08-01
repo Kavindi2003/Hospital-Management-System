@@ -7,116 +7,156 @@
 
     <title>Ward Management</title>
 
-    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="/css/ward.css">
 </head>
 
 <body>
 
+
 <div class="header">
+
     <h1>Hospital Management System</h1>
+
     <p>Ward and Room Allocation</p>
+
 </div>
+
 
 
 <div class="container">
 
+
     <div id="message"></div>
 
 
-    <!-- ================= WARD FORM ================= -->
+    <!-- WARD FORM -->
 
     <div class="card">
 
-        <h2 id="wardTitle">Add Ward</h2>
+        <h2 id="wardTitle">
+            Add Ward
+        </h2>
+
 
         <form id="wardForm">
 
+
             <input type="hidden" id="wardId">
 
+
             <label>Ward Name</label>
+
             <input type="text" id="wardName" required>
 
 
+
             <label>Capacity</label>
+
             <input type="number" id="capacity" min="1" required>
 
 
+
             <label>Occupied Beds</label>
-            <input type="number" id="occupiedBeds" min="0" value="0" required>
+
+            <input type="number" id="occupiedBeds" value="0" min="0" required>
 
 
-            <div class="button-area">
 
-                <button type="submit" class="save-button">
-                    Save Ward
-                </button>
+            <button class="save-button" type="submit">
+                Save Ward
+            </button>
 
-                <button type="button"
-                        class="clear-button"
-                        onclick="clearWardForm()">
-                    Clear
-                </button>
 
-            </div>
+            <button class="clear-button"
+                    type="button"
+                    onclick="clearWardForm()">
+
+                Clear
+
+            </button>
+
 
         </form>
+
 
     </div>
 
 
-    <!-- ================= WARD TABLE ================= -->
+
+
+    <!-- WARD TABLE -->
+
 
     <div class="card">
 
+
         <h2>Ward List</h2>
 
+
         <table>
+
 
             <thead>
 
             <tr>
+
                 <th>ID</th>
                 <th>Ward Name</th>
                 <th>Capacity</th>
                 <th>Occupied</th>
                 <th>Available</th>
                 <th>Actions</th>
+
             </tr>
 
+
             </thead>
+
 
             <tbody id="wardTable">
 
             </tbody>
 
+
         </table>
+
 
     </div>
 
 
-    <!-- ================= ALLOCATION FORM ================= -->
+
+
+
+    <!-- ALLOCATION -->
+
 
     <div class="card">
+
 
         <h2 id="allocationTitle">
             Add Room Allocation
         </h2>
 
+
+
         <form id="allocationForm">
+
 
             <input type="hidden" id="allocationId">
 
 
+
             <label>Patient ID</label>
+
             <input type="number"
                    id="patientId"
-                   min="1"
                    required>
+
 
 
             <label>Ward</label>
 
-            <select id="wardSelect" required>
+            <select id="wardSelect">
 
                 <option value="">
                     Select Ward
@@ -125,60 +165,74 @@
             </select>
 
 
+
             <label>Bed Number</label>
-            <input type="number"
+
+            <input type="text"
                    id="bedNumber"
-                   min="1"
                    required>
 
 
+
+
             <label>Admission Date</label>
+
             <input type="datetime-local"
                    id="admissionDate"
                    required>
 
 
+
+
             <label>Discharge Date</label>
+
             <input type="datetime-local"
                    id="dischargeDate">
 
 
-            <div class="button-area">
 
-                <button type="submit"
-                        class="save-button">
+            <button class="save-button"
+                    type="submit">
 
-                    Save Allocation
+                Save Allocation
 
-                </button>
+            </button>
 
 
-                <button type="button"
-                        class="clear-button"
-                        onclick="clearAllocationForm()">
+            <button class="clear-button"
+                    type="button"
+                    onclick="clearAllocationForm()">
 
-                    Clear
+                Clear
 
-                </button>
+            </button>
 
-            </div>
 
         </form>
+
 
     </div>
 
 
-    <!-- ================= ALLOCATION TABLE ================= -->
+
+
+
 
     <div class="card">
 
-        <h2>Room Allocation List</h2>
+
+        <h2>
+            Room Allocation List
+        </h2>
+
 
         <table>
+
 
             <thead>
 
             <tr>
+
                 <th>ID</th>
                 <th>Patient ID</th>
                 <th>Ward ID</th>
@@ -186,22 +240,34 @@
                 <th>Admission</th>
                 <th>Discharge</th>
                 <th>Actions</th>
+
+
             </tr>
+
 
             </thead>
 
+
             <tbody id="allocationTable">
+
 
             </tbody>
 
+
         </table>
 
+
     </div>
+
+
 
 </div>
 
 
-<script src="../js/main.js"></script>
+
+
+<script src="/js/ward.js"></script>
+
 
 </body>
 
