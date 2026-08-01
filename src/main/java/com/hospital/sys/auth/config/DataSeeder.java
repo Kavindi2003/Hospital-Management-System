@@ -13,7 +13,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 //
 // Demo logins (change these before anything ever goes near production):
 //   admin        / admin123
-//   dr.smith     / doctor123
+//   dr.smith     / doctor123   (linked to staffId=2, "Sarah Smith" in the
+//                                staff table -- CHECK this matches your
+//                                actual seeded staff_id before demoing;
+//                                auto-increment drift has changed these
+//                                IDs before, see the sql.init.mode fix)
 //   nurse.joy    / nurse123
 //   frontdesk    / reception123
 @Configuration
@@ -27,7 +31,9 @@ public class DataSeeder {
             }
 
             userRepository.save(new User("admin", encoder.encode("admin123"), "ADMIN"));
-            userRepository.save(new User("dr.smith", encoder.encode("doctor123"), "DOCTOR"));
+            // staffId=2L assumes Sarah Smith is staff_id 2 in your current DB.
+            // Check `SELECT * FROM staff;` and update this if it doesn't match.
+            userRepository.save(new User("dr.smith", encoder.encode("doctor123"), "DOCTOR", 2L));
             userRepository.save(new User("nurse.joy", encoder.encode("nurse123"), "NURSE"));
             userRepository.save(new User("frontdesk", encoder.encode("reception123"), "RECEPTIONIST"));
         };
