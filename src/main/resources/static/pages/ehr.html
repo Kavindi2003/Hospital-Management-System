@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electronic Health Records | Hospital Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/ehr.css">
+</head>
+<body>
+<div class="app">
+    <header>
+        <div class="brand">
+            <h1>Electronic Health Records</h1>
+            <p>Manage diagnoses and treatment plans via <code>/api/medical-records</code></p>
+            <a href="/index.html" class="back-link">&larr; Back to dashboard</a>
+        </div>
+        <div class="toolbar">
+            <div class="search-group">
+                <input type="number" id="filterRecordId" class="id-filter" placeholder="Record ID" min="1">
+                <button type="button" class="btn btn-ghost" id="btnLookupRecord">Lookup</button>
+                <input type="number" id="filterPatientId" class="id-filter" placeholder="Patient ID" min="1">
+                <button type="button" class="btn btn-ghost" id="btnFilterPatient">By patient</button>
+            </div>
+            <button type="button" class="btn btn-ghost" id="btnRefresh">Refresh all</button>
+            <button type="button" class="btn btn-primary" id="btnNewRecord">+ New record</button>
+        </div>
+    </header>
+
+    <div class="stats">
+        <div class="stat-card">
+            <span>Total records</span>
+            <strong id="statTotal">&mdash;</strong>
+        </div>
+        <div class="stat-card">
+            <span>View</span>
+            <strong id="statView" style="font-size: 1rem; color: var(--text);">All records</strong>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="loading-bar" id="loadingBar" aria-hidden="true"></div>
+        <div class="panel-head">
+            <h2 id="panelTitle">Medical records</h2>
+            <span class="badge" id="apiBadge">GET /api/medical-records</span>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Patient</th>
+                    <th>Doctor</th>
+                    <th>Diagnosis</th>
+                    <th>Treatment</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="recordsBody">
+                </tbody>
+            </table>
+        </div>
+        <div class="empty-state" id="emptyState" hidden>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M9 12h6M9 16h6M7 4h10l2 4v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6l2-4z"/>
+            </svg>
+            <p>No records to show. Create one or adjust your filter.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Create / Edit modal -->
+<div class="overlay" id="formOverlay" role="dialog" aria-modal="true" aria-labelledby="formModalTitle">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="formModalTitle">New medical record</h3>
+        </div>
+        <form id="recordForm">
+            <div class="modal-body">
+                <input type="hidden" id="editRecordId">
+                <div class="field" id="patientField">
+                    <label for="patientId">Patient ID *</label>
+                    <input type="number" id="patientId" name="patientId" min="1" required>
+                </div>
+                <div class="field" id="doctorField">
+                    <label for="doctorId">Doctor ID (staff) *</label>
+                    <input type="number" id="doctorId" name="doctorId" min="1" required>
+                    <p class="hint">Must match an existing staff member in the database.</p>
+                </div>
+                <div class="field">
+                    <label for="diagnosis">Diagnosis *</label>
+                    <textarea id="diagnosis" name="diagnosis" required placeholder="Clinical diagnosis&hellip;"></textarea>
+                </div>
+                <div class="field">
+                    <label for="treatmentPlan">Treatment plan</label>
+                    <textarea id="treatmentPlan" name="treatmentPlan" placeholder="Medication, follow-up, referrals&hellip;"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-ghost" id="btnCancelForm">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="btnSubmitForm">Save record</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- View detail modal -->
+<div class="overlay" id="viewOverlay" role="dialog" aria-modal="true" aria-labelledby="viewModalTitle">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="viewModalTitle">Record details</h3>
+        </div>
+        <div class="modal-body">
+            <dl class="detail-grid" id="viewDetails"></dl>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" id="btnCloseView">Close</button>
+            <button type="button" class="btn btn-primary" id="btnEditFromView">Edit</button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete confirm -->
+<div class="overlay" id="deleteOverlay" role="dialog" aria-modal="true">
+    <div class="modal modal-narrow">
+        <div class="modal-header">
+            <h3>Delete record?</h3>
+        </div>
+        <div class="modal-body">
+            <p style="margin: 0; color: var(--text-muted);">This permanently removes record <strong id="deleteRecordLabel"></strong>. This cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" id="btnCancelDelete">Cancel</button>
+            <button type="button" class="btn btn-danger" id="btnConfirmDelete">Delete</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+<script src="/js/ehr.js"></script>
+</body>
+</html>
