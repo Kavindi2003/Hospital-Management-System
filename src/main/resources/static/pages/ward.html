@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Ward Management</title>
+
+    <link rel="stylesheet" href="/css/ward.css">
+</head>
+
+<body>
+
+
+<div class="header">
+
+    <h1>Hospital Management System</h1>
+
+    <p>Ward and Room Allocation</p>
+
+</div>
+
+
+
+<div class="container">
+
+
+    <div id="message"></div>
+
+
+    <!-- WARD FORM -->
+
+    <div class="card">
+
+        <h2 id="wardTitle">
+            Add Ward
+        </h2>
+
+
+        <form id="wardForm">
+
+
+            <input type="hidden" id="wardId">
+
+
+            <label>Ward Name</label>
+
+            <input type="text" id="wardName" required>
+
+
+
+            <label>Capacity</label>
+
+            <input type="number" id="capacity" min="1" required>
+
+
+
+            <label>Occupied Beds</label>
+
+            <input type="number" id="occupiedBeds" value="0" min="0" required>
+
+
+
+            <button class="save-button" type="submit">
+                Save Ward
+            </button>
+
+
+            <button class="clear-button"
+                    type="button"
+                    onclick="clearWardForm()">
+
+                Clear
+
+            </button>
+
+
+        </form>
+
+
+    </div>
+
+
+
+
+    <!-- WARD TABLE -->
+
+
+    <div class="card">
+
+
+        <h2>Ward List</h2>
+
+
+        <table>
+
+
+            <thead>
+
+            <tr>
+
+                <th>ID</th>
+                <th>Ward Name</th>
+                <th>Capacity</th>
+                <th>Occupied</th>
+                <th>Available</th>
+                <th>Actions</th>
+
+            </tr>
+
+
+            </thead>
+
+
+            <tbody id="wardTable">
+
+            </tbody>
+
+
+        </table>
+
+
+    </div>
+
+
+
+
+
+    <!-- ALLOCATION -->
+
+
+    <div class="card">
+
+
+        <h2 id="allocationTitle">
+            Add Room Allocation
+        </h2>
+
+
+
+        <form id="allocationForm">
+
+
+            <input type="hidden" id="allocationId">
+
+
+
+            <label>Patient ID</label>
+
+            <input type="number"
+                   id="patientId"
+                   required>
+
+
+
+            <label>Ward</label>
+
+            <select id="wardSelect" required>
+
+                <option value="">
+                    Select Ward
+                </option>
+
+            </select>
+
+
+
+            <label>Bed Number</label>
+
+            <input type="text"
+                   id="bedNumber"
+                   required>
+
+
+
+
+            <label>Admission Date</label>
+
+            <input type="datetime-local"
+                   id="admissionDate"
+                   required>
+
+
+
+
+            <label>Discharge Date</label>
+
+            <input type="datetime-local"
+                   id="dischargeDate">
+
+
+
+            <button class="save-button"
+                    type="submit">
+
+                Save Allocation
+
+            </button>
+
+
+            <button class="clear-button"
+                    type="button"
+                    onclick="clearAllocationForm()">
+
+                Clear
+
+            </button>
+
+
+        </form>
+
+
+    </div>
+
+
+
+
+
+
+    <div class="card">
+
+
+        <h2>
+            Room Allocation List
+        </h2>
+
+
+        <table>
+
+
+            <thead>
+
+            <tr>
+
+                <th>ID</th>
+                <th>Patient ID</th>
+                <th>Ward ID</th>
+                <th>Bed</th>
+                <th>Admission</th>
+                <th>Discharge</th>
+                <th>Actions</th>
+
+
+            </tr>
+
+
+            </thead>
+
+
+            <tbody id="allocationTable">
+
+
+            </tbody>
+
+
+        </table>
+
+
+    </div>
+
+
+
+</div>
+
+
+
+
+<script src="/js/ward.js"></script>
+
+
+</body>
+
+</html>

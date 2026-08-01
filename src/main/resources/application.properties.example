@@ -17,4 +17,4 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
 # IMPORTANT: switch to spring.sql.init.mode=never after that one-time load to prevent
 # auto-increment drift from repeated INSERT IGNORE executions on every startup.
 # Execute schema.sql and data.sql on startup
-spring.sql.init.mode=always
+spring.sql.init.mode=never
