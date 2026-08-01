@@ -1,0 +1,54 @@
+/* Pharmacy and Inventory page-specific styles */
+
+.id-filter {
+    width: 110px;
+}
+
+.field input {
+    width: 100%;
+}
+
+input[type="date"] {
+    width: 100%;
+    font: inherit;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 10px;
+    padding: 0.65rem 0.85rem;
+}
+
+input[type="date"]:focus {
+    outline: none;
+    border-color: rgba(45, 212, 191, 0.5);
+    box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+.modal-narrow {
+    max-width: 420px;
+}
+
+.stock-low {
+    background: var(--danger-dim);
+    color: var(--danger);
+}
+
+.stock-normal {
+    background: var(--accent-dim);
+    color: var(--accent);
+}
+
+.expired {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+.expiring-soon {
+    color: var(--warning);
+    font-weight: 600;
+}
+
+.warning-text {
+    color: var(--danger);
+    margin: 0;
+}
