@@ -50,7 +50,12 @@
                 <div class="field" id="staffIdField" style="margin-bottom: 0.85rem; display: none;">
                     <label for="newStaffId">Staff ID</label>
                     <input type="number" id="newStaffId" min="1">
-                    <p class="hint">Required for Doctor accounts &mdash; links this login to their row in the Staff module, so they only see their own patients' records.</p>
+                    <p class="hint" style="color: var(--warning);">
+                        &#9888; A staff record with this ID must already exist in the Staff module
+                        before creating this account &mdash; check <code>GET /staff</code> or the
+                        Staff page first if you're not sure of the ID. This links the login to
+                        that staff member (e.g. so a Doctor only sees their own patients' records).
+                    </p>
                 </div>
                 <button type="submit" class="btn btn-primary">Create account</button>
             </form>
@@ -171,7 +176,8 @@
     });
 
     document.getElementById('newRole').addEventListener('change', (e) => {
-        document.getElementById('staffIdField').style.display = e.target.value === 'DOCTOR' ? 'block' : 'none';
+        const needsStaff = ['DOCTOR', 'NURSE', 'RECEPTIONIST'].includes(e.target.value);
+        document.getElementById('staffIdField').style.display = needsStaff ? 'block' : 'none';
     });
 
     document.getElementById('addUserForm').addEventListener('submit', async (e) => {
@@ -179,8 +185,9 @@
         const username = document.getElementById('newUsername').value.trim();
         const password = document.getElementById('newPassword').value;
         const role = document.getElementById('newRole').value;
+        const needsStaff = ['DOCTOR', 'NURSE', 'RECEPTIONIST'].includes(role);
         const staffIdRaw = document.getElementById('newStaffId').value;
-        const staffId = staffIdRaw ? Number(staffIdRaw) : null;
+        const staffId = (needsStaff && staffIdRaw) ? Number(staffIdRaw) : null;
 
         try {
             const res = await fetch('/api/auth/register', {
@@ -197,6 +204,7 @@
 
             showAddUserAlert(`Account "${data.username}" (${data.role}) created successfully.`, 'success');
             document.getElementById('addUserForm').reset();
+            document.getElementById('staffIdField').style.display = 'none';
             loadUsers();
         } catch (err) {
             showAddUserAlert('Could not reach the server.', 'error');

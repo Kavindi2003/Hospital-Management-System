@@ -52,10 +52,6 @@ public class AuthController {
     // explicit hasRole("ADMIN") rule for this exact path) -- this method
     // doesn't need to re-check the role itself, Spring Security already
     // rejects anyone else with a 403 before this code ever runs.
-    //
-    // Exists mainly so a new user (e.g. for a viva demo) can be added
-    // through the running app instead of hand-writing SQL with a
-    // pre-computed BCrypt hash.
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         if (request.username() == null || request.username().isBlank()
@@ -76,11 +72,26 @@ public class AuthController {
                     .body(Map.of("message", "That username is already taken."));
         }
 
-        // DOCTOR accounts must be linked to a staff record, or the EHR module
-        // has no way to know which doctor's records this login should see.
-        if (role.equals("DOCTOR") && request.staffId() == null) {
+        // DOCTOR/NURSE/RECEPTIONIST accounts must be linked to a staff record,
+        // or the system has no way to know which real staff member this
+        // login corresponds to (e.g. EHR filters a doctor's records by it).
+        boolean needsStaff = List.of("DOCTOR", "NURSE", "RECEPTIONIST").contains(role);
+        if (needsStaff && request.staffId() == null) {
             return ResponseEntity.badRequest()
-                    .body(Map.of("message", "A Doctor account needs a Staff ID so their records can be filtered correctly."));
+                    .body(Map.of("message", "This role needs a linked Staff ID."));
+        }
+
+        // Prevent two different login accounts from both linking to the same
+        // staff member -- this is a server-side safety net; the dashboard's
+        // dropdown already filters these out client-side, but a direct API
+        // call (e.g. via Postman) could otherwise still create the duplicate.
+        if (request.staffId() != null) {
+            boolean alreadyLinked = userRepository.findAll().stream()
+                    .anyMatch(u -> request.staffId().equals(u.getStaffId()));
+            if (alreadyLinked) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(Map.of("message", "That staff member already has a login account linked to them."));
+            }
         }
 
         User newUser = new User(
