@@ -38,8 +38,9 @@ public class SecurityConfig {
                 // send it back as an X-XSRF-TOKEN header on each fetch() call.
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Public: login page itself, and static assets needed to render it
-                        .requestMatchers("/login.html", "/css/**", "/js/**").permitAll()
+                        // Public: the landing page (and root, which serves it), the
+                        // login page itself, and static assets needed to render both
+                        .requestMatchers("/", "/index.html", "/login.html", "/css/**", "/js/**").permitAll()
 
                         // Dashboard + "who am I" endpoint: any logged-in user, any role
                         .requestMatchers("/pages/dashboard.html", "/api/auth/me").authenticated()
