@@ -9,7 +9,6 @@ public class MedicalRecordService {
 
     private final MedicalRecordRepository repository;
 
-    // Dependency Injection via constructor
     public MedicalRecordService(MedicalRecordRepository repository) {
         this.repository = repository;
     }
@@ -19,9 +18,16 @@ public class MedicalRecordService {
         return repository.save(record);
     }
 
-    // Get all medical records
+    // Get all medical records - no scoping. Only ever called for ADMIN,
+    // enforced in the controller.
     public List<MedicalRecord> getAllRecords() {
         return repository.findAll();
+    }
+
+    // Get only the records belonging to one doctor. This is what a
+    // logged-in DOCTOR account actually sees.
+    public List<MedicalRecord> getRecordsForDoctor(Long doctorId) {
+        return repository.findByDoctorId(doctorId);
     }
 
     // Get record by ID
