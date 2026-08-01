@@ -44,6 +44,9 @@ public class SecurityConfig {
                         // Dashboard + "who am I" endpoint: any logged-in user, any role
                         .requestMatchers("/pages/dashboard.html", "/api/auth/me").authenticated()
 
+                        // Creating, listing, and deleting accounts are all admin-only actions
+                        .requestMatchers("/api/auth/register", "/api/auth/users/**").hasRole("ADMIN")
+
                         // ---- Role-specific pages ----
                         // These match dashboard.html's own MODULES list, so what a role
                         // can SEE (the module card) and what they can actually OPEN agree.

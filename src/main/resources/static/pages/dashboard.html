@@ -24,6 +24,47 @@
 
     <div class="section-label">Your modules</div>
     <div class="module-grid" id="moduleGrid"></div>
+
+    <div id="addUserPanel" hidden>
+        <div class="section-label">Admin &mdash; add a user</div>
+        <div class="stat-card" style="max-width: 420px; margin-bottom: 1.5rem;">
+            <div id="addUserAlert" class="alert" hidden style="margin-bottom: 0.85rem;"></div>
+            <form id="addUserForm">
+                <div class="field" style="margin-bottom: 0.85rem;">
+                    <label for="newUsername">Username</label>
+                    <input type="text" id="newUsername" required>
+                </div>
+                <div class="field" style="margin-bottom: 0.85rem;">
+                    <label for="newPassword">Password</label>
+                    <input type="password" id="newPassword" required>
+                </div>
+                <div class="field" style="margin-bottom: 0.85rem;">
+                    <label for="newRole">Role</label>
+                    <select id="newRole" style="width: 100%; font: inherit; background: var(--surface); border: 1px solid var(--border); color: var(--text); border-radius: 10px; padding: 0.65rem 0.85rem;">
+                        <option value="ADMIN">Admin</option>
+                        <option value="DOCTOR">Doctor</option>
+                        <option value="NURSE">Nurse</option>
+                        <option value="RECEPTIONIST">Receptionist</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Create account</button>
+            </form>
+        </div>
+
+        <div class="section-label">Existing accounts</div>
+        <div class="panel">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr><th>Username</th><th>Role</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody id="userListBody">
+                    <tr><td colspan="3" style="color: var(--text-muted);">Loading&hellip;</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -62,7 +103,93 @@
                 <p>${escapeHtml(m.desc)}</p>
             </a>
         `).join('');
+
+        if (role === 'ADMIN') {
+            document.getElementById('addUserPanel').hidden = false;
+            loadUsers();
+        }
     }
+
+    function showAddUserAlert(message, type) {
+        const el = document.getElementById('addUserAlert');
+        el.textContent = message;
+        el.className = `alert alert-${type}`;
+        el.hidden = false;
+    }
+
+    async function loadUsers() {
+        const body = document.getElementById('userListBody');
+        try {
+            const res = await fetch('/api/auth/users');
+            if (!res.ok) throw new Error('Request failed');
+            const users = await res.json();
+
+            if (!users.length) {
+                body.innerHTML = '<tr><td colspan="3" style="color: var(--text-muted);">No accounts yet.</td></tr>';
+                return;
+            }
+
+            body.innerHTML = users.map(u => `
+                <tr>
+                    <td>${escapeHtml(u.username)}</td>
+                    <td><span class="badge">${escapeHtml(u.role)}</span></td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm" data-delete-id="${u.userId}">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        } catch (err) {
+            body.innerHTML = '<tr><td colspan="3" style="color: var(--danger);">Couldn\'t load accounts.</td></tr>';
+        }
+    }
+
+    document.getElementById('userListBody').addEventListener('click', async (e) => {
+        const btn = e.target.closest('[data-delete-id]');
+        if (!btn) return;
+
+        const id = btn.dataset.deleteId;
+        const username = btn.closest('tr').querySelector('td').textContent;
+        if (!confirm(`Delete account "${username}"? This can't be undone.`)) return;
+
+        try {
+            const res = await fetch(`/api/auth/users/${id}`, { method: 'DELETE' });
+            if (res.status === 204) {
+                loadUsers();
+                return;
+            }
+            const data = await res.json().catch(() => ({}));
+            showAddUserAlert(data.message || 'Could not delete that account.', 'error');
+        } catch (err) {
+            showAddUserAlert('Could not reach the server.', 'error');
+        }
+    });
+
+    document.getElementById('addUserForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('newUsername').value.trim();
+        const password = document.getElementById('newPassword').value;
+        const role = document.getElementById('newRole').value;
+
+        try {
+            const res = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password, role })
+            });
+            const data = await res.json();
+
+            if (!res.ok) {
+                showAddUserAlert(data.message || 'Could not create the account.', 'error');
+                return;
+            }
+
+            showAddUserAlert(`Account "${data.username}" (${data.role}) created successfully.`, 'success');
+            document.getElementById('addUserForm').reset();
+            loadUsers();
+        } catch (err) {
+            showAddUserAlert('Could not reach the server.', 'error');
+        }
+    });
 
     fetch('/api/auth/me')
         .then(res => {
