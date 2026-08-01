@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -41,7 +40,37 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Public: login page itself, and static assets needed to render it
                         .requestMatchers("/login.html", "/css/**", "/js/**").permitAll()
-                        // Everything else (all /api/** and /pages/**) requires a logged-in user
+
+                        // Dashboard + "who am I" endpoint: any logged-in user, any role
+                        .requestMatchers("/pages/dashboard.html", "/api/auth/me").authenticated()
+
+                        // ---- Role-specific pages ----
+                        // These match dashboard.html's own MODULES list, so what a role
+                        // can SEE (the module card) and what they can actually OPEN agree.
+                        .requestMatchers("/pages/staff.html").hasRole("ADMIN")
+                        .requestMatchers("/pages/ehr.html").hasAnyRole("ADMIN", "DOCTOR")
+                        .requestMatchers("/pages/ward.html", "/pages/inventory.html")
+                        .hasAnyRole("ADMIN", "NURSE")
+                        .requestMatchers("/pages/billing.html").hasAnyRole("ADMIN", "RECEPTIONIST")
+                        .requestMatchers("/pages/appointment.html")
+                        .hasAnyRole("ADMIN", "DOCTOR", "RECEPTIONIST")
+                        .requestMatchers("/pages/patient.html")
+                        .hasAnyRole("ADMIN", "DOCTOR", "NURSE", "RECEPTIONIST")
+
+                        // ---- Role-specific APIs (the part that actually matters --
+                        // without this, someone could bypass the hidden module card
+                        // entirely by calling the API directly, e.g. via curl/Postman) ----
+                        .requestMatchers("/staff/**").hasRole("ADMIN")
+                        .requestMatchers("/api/medical-records/**").hasAnyRole("ADMIN", "DOCTOR")
+                        .requestMatchers("/api/wards/**", "/api/allocations/**", "/api/inventory/**")
+                        .hasAnyRole("ADMIN", "NURSE")
+                        .requestMatchers("/api/bills/**").hasAnyRole("ADMIN", "RECEPTIONIST")
+                        .requestMatchers("/api/appointments/**")
+                        .hasAnyRole("ADMIN", "DOCTOR", "RECEPTIONIST")
+                        .requestMatchers("/api/patients/**")
+                        .hasAnyRole("ADMIN", "DOCTOR", "NURSE", "RECEPTIONIST")
+
+                        // Anything else not listed above still just requires login
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -58,28 +87,26 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/login.html?logout=true")
                         .permitAll()
                 )
-                // CSRF left enabled by default for form login. If your module JS
-                // does POST/PUT/DELETE via fetch() without a CSRF token, those
-                // calls will be rejected with 403 -- see the note in the README
-                // section below on including the CSRF token in fetch() headers.
+                // Access-denied case: a logged-in user hitting a page/API their role
+                // doesn't cover (e.g. a Nurse requesting /api/bills/**) gets a plain
+                // 403 rather than being silently redirected anywhere.
+                .exceptionHandling(ex -> ex
+                        .accessDeniedPage("/login.html?denied=true")
+                )
                 .userDetailsService(userDetailsService);
 
         return http.build();
     }
 
-    // Decides where to send the user right after a successful login,
-    // based on their role -- this is the actual "different dashboard
-    // per role" behavior.
+    // Decides where to send the user right after a successful login.
+    // Everyone lands on the same dashboard.html; its own JS calls
+    // /api/auth/me to find out the role and show/hide module cards
+    // accordingly. Admin gets every module; others get a filtered set.
+    // (The actual enforcement now also happens server-side above --
+    // this redirect just picks the landing page, it isn't the security boundary.)
     @Bean
     public org.springframework.security.web.authentication.AuthenticationSuccessHandler roleBasedSuccessHandler() {
-        return (request, response, authentication) -> {
-            boolean isAdmin = authentication.getAuthorities().stream()
-                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-
-            // Everyone lands on the same dashboard.html; its own JS calls
-            // /api/auth/me to find out the role and show/hide module cards
-            // accordingly. Admin gets every module; others get a filtered set.
-            response.sendRedirect("/pages/dashboard.html");
-        };
+        return (request, response, authentication) ->
+                response.sendRedirect("/pages/dashboard.html");
     }
 }
