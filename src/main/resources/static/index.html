@@ -8,83 +8,55 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/styles.css">
-    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/landing.css">
 </head>
 <body>
-<div class="app">
-    <header>
-        <div class="brand">
-            <h1>Hospital Management System</h1>
-            <p>Module directory &mdash; the integration board for this project's build</p>
-        </div>
-        <div class="stats" style="margin-bottom: 0;">
-            <div class="stat-card">
-                <span>Modules connected</span>
-                <strong>2 / 7</strong>
-            </div>
-        </div>
-    </header>
 
-    <div class="section-label">Active modules</div>
-    <div class="module-grid">
+<nav class="landing-nav">
+    <div class="logo">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M4 21V8l8-5 8 5v13"/>
+            <path d="M9 21v-6h6v6"/>
+            <path d="M12 11v4M10 13h4"/>
+        </svg>
+        Hospital Management System
+    </div>
+</nav>
 
-        <a href="/pages/staff.html" class="module-card">
-            <span class="mod-code">MOD&#8209;01</span>
-            <h3>Staff</h3>
-            <p>Doctors, nurses, and support staff. Backed by <code>/staff</code>.</p>
-            <span class="status">&#9679; Connected</span>
-        </a>
-
-        <a href="/pages/ehr.html" class="module-card">
-            <span class="mod-code">MOD&#8209;02</span>
-            <h3>Medical Records</h3>
-            <p>Diagnoses and treatment plans. Backed by <code>/api/medical-records</code>.</p>
-            <span class="status">&#9679; Connected</span>
-        </a>
-
+<section class="hero">
+    <div>
+        <h1>Modern Healthcare Management</h1>
+        <p class="lead">A secure and efficient platform for managing patients, appointments, medical records, staff, pharmacy inventory and billing.</p>
+        <a href="/login.html" class="btn btn-primary btn-large">Explore System</a>
     </div>
 
-    <div class="section-label">Pending modules</div>
-    <div class="module-grid">
+    <div class="hero-art">
+        <svg viewBox="0 0 320 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Central cross / hospital mark -->
+            <rect x="140" y="60" width="40" height="140" rx="8" fill="var(--accent)" opacity="0.85"/>
+            <rect x="90" y="110" width="140" height="40" rx="8" fill="var(--accent)" opacity="0.85"/>
 
-        <a href="/pages/patient.html" class="module-card pending">
-            <span class="mod-code">MOD&#8209;03</span>
-            <h3>Patients</h3>
-            <p>Patient records and intake details.</p>
-            <span class="status">Not yet connected</span>
-        </a>
+            <!-- Orbiting module nodes, echoing the module cards elsewhere in the app -->
+            <circle cx="60" cy="70" r="26" fill="var(--surface-elevated)" stroke="var(--border)"/>
+            <path d="M50 70h20M60 60v20" stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round"/>
 
-        <a href="/pages/appointment.html" class="module-card pending">
-            <span class="mod-code">MOD&#8209;04</span>
-            <h3>Appointments</h3>
-            <p>Scheduling between patients and doctors.</p>
-            <span class="status">Not yet connected</span>
-        </a>
+            <circle cx="260" cy="60" r="26" fill="var(--surface-elevated)" stroke="var(--border)"/>
+            <rect x="249" y="49" width="22" height="22" rx="3" stroke="var(--accent)" stroke-width="2.2" fill="none"/>
 
-        <a href="/pages/ward.html" class="module-card pending">
-            <span class="mod-code">MOD&#8209;05</span>
-            <h3>Wards &amp; Rooms</h3>
-            <p>Ward capacity and bed allocation.</p>
-            <span class="status">Not yet connected</span>
-        </a>
+            <circle cx="55" cy="195" r="26" fill="var(--surface-elevated)" stroke="var(--border)"/>
+            <path d="M45 195h20M55 185v20" stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round" transform="rotate(45 55 195)"/>
 
-        <a href="/pages/inventory.html" class="module-card pending">
-            <span class="mod-code">MOD&#8209;06</span>
-            <h3>Pharmacy Inventory</h3>
-            <p>Medicine stock and batch tracking.</p>
-            <span class="status">Not yet connected</span>
-        </a>
+            <circle cx="265" cy="195" r="26" fill="var(--surface-elevated)" stroke="var(--border)"/>
+            <circle cx="265" cy="195" r="9" stroke="var(--accent)" stroke-width="2.2" fill="none"/>
 
-        <a href="/pages/billing.html" class="module-card pending">
-            <span class="mod-code">MOD&#8209;07</span>
-            <h3>Billing</h3>
-            <p>Patient invoices and payment status.</p>
-            <span class="status">Not yet connected</span>
-        </a>
-
+            <!-- Connecting lines -->
+            <path d="M84 78 L140 100" stroke="var(--border)" stroke-width="1.5"/>
+            <path d="M236 76 L182 100" stroke="var(--border)" stroke-width="1.5"/>
+            <path d="M80 185 L140 160" stroke="var(--border)" stroke-width="1.5"/>
+            <path d="M240 188 L182 160" stroke="var(--border)" stroke-width="1.5"/>
+        </svg>
     </div>
+</section>
 
-    <div class="app-footer">Hospital Management System &mdash; mini project, module directory</div>
-</div>
 </body>
 </html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Hospital Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .login-wrap {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            width: 100%;
+            max-width: 380px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+        }
+        .login-card h1 {
+            font-family: "Instrument Serif", Georgia, serif;
+            font-size: 1.75rem;
+            font-weight: 400;
+            margin: 0 0 0.35rem;
+        }
+        .login-card p.sub {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin: 0 0 1.5rem;
+        }
+        .login-card .field { margin-bottom: 1rem; }
+        .login-card input[type="text"],
+        .login-card input[type="password"] { width: 100%; }
+        .login-card .btn { width: 100%; justify-content: center; margin-top: 0.5rem; }
+        .alert {
+            font-size: 0.8125rem;
+            padding: 0.65rem 0.85rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+        .alert-error {
+            background: var(--danger-dim);
+            color: var(--danger);
+            border: 1px solid rgba(248, 113, 113, 0.25);
+        }
+        .alert-success {
+            background: var(--accent-dim);
+            color: var(--accent);
+            border: 1px solid rgba(45, 212, 191, 0.25);
+        }
+        .demo-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 1.25rem;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+<div class="login-wrap">
+    <div class="login-card">
+        <h1>Hospital Management System</h1>
+        <p class="sub">Sign in to continue</p>
+
+        <div id="errorAlert" class="alert alert-error" hidden>Invalid username or password.</div>
+        <div id="logoutAlert" class="alert alert-success" hidden>You've been logged out.</div>
+
+        <form action="/perform-login" method="POST">
+            <div class="field">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required autofocus>
+            </div>
+            <div class="field">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Sign in</button>
+        </form>
+
+        <p class="demo-hint">
+            Demo accounts &mdash; admin / admin123 &middot; dr.smith / doctor123 &middot;
+            nurse.joy / nurse123 &middot; frontdesk / reception123
+        </p>
+    </div>
+</div>
+
+<script>
+    // Spring Security appends these query params on failure/logout redirects.
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('error')) document.getElementById('errorAlert').hidden = false;
+    if (params.get('logout')) document.getElementById('logoutAlert').hidden = false;
+</script>
+</body>
+</html>
