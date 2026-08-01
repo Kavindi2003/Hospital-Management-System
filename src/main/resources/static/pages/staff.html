@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Management</title>
+
+    <!-- Staff CSS -->
+    <link rel="stylesheet" href="../css/staff.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Staff Management</h1>
+
+    <!-- ==========================
+            Staff Form
+    =========================== -->
+
+    <div class="form-card">
+
+        <h2>Add New Staff</h2>
+
+        <form id="staffForm">
+
+            <!-- Hidden ID (used when editing) -->
+            <input type="hidden" id="staffId">
+
+            <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input
+                        type="text"
+                        id="firstName"
+                        placeholder="Enter first name"
+                        required>
+            </div>
+
+            <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input
+                        type="text"
+                        id="lastName"
+                        placeholder="Enter last name"
+                        required>
+            </div>
+
+            <div class="form-group">
+                <label for="role">Role</label>
+
+                <select id="role" required>
+                    <option value="">Select Role</option>
+                    <option value="Doctor">Doctor</option>
+                    <option value="Nurse">Nurse</option>
+                    <option value="Receptionist">Receptionist</option>
+                    <option value="Pharmacist">Pharmacist</option>
+                    <option value="Lab Technician">Lab Technician</option>
+                    <option value="Administrator">Administrator</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="specialization">Specialization</label>
+                <input
+                        type="text"
+                        id="specialization"
+                        placeholder="Enter specialization">
+            </div>
+
+            <div class="form-group">
+                <label for="phoneNumber">Phone Number</label>
+                <input
+                        type="text"
+                        id="phoneNumber"
+                        placeholder="Enter phone number">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input
+                        type="email"
+                        id="email"
+                        placeholder="Enter email"
+                        required>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" id="saveBtn">
+                    Save Staff
+                </button>
+
+                <button type="reset">
+                    Clear
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- ==========================
+            Search Bar
+    =========================== -->
+
+    <div class="search-section">
+
+        <input
+                type="text"
+                id="searchInput"
+                placeholder="Search by first name or last name">
+
+    </div>
+
+
+    <!-- ==========================
+            Staff Table
+    =========================== -->
+
+    <div class="table-card">
+
+        <table id="staffTable">
+
+            <thead>
+
+            <tr>
+
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Role</th>
+                <th>Specialization</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Actions</th>
+
+            </tr>
+
+            </thead>
+
+            <tbody>
+
+            <!-- JavaScript will insert rows here -->
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<!-- Staff JavaScript -->
+<script src="../js/staff.js"></script>
+
+</body>
+</html>
