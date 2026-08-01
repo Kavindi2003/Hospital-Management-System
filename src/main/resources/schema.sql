@@ -86,3 +86,25 @@ CREATE TABLE IF NOT EXISTS bills (
     billing_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (patient_id) REFERENCES patients(patient_id) ON DELETE CASCADE
     );
+
+-- Users table (login accounts) — added for authentication/authorization.
+-- staff_id links a login account to a row in the staff table, so the system
+-- can answer "which staff member is this logged-in user" -- e.g. for
+-- scoping a doctor's view of medical records to only their own patients.
+--
+-- DOCTOR/NURSE/RECEPTIONIST accounts are all linked to a real staff row;
+-- ADMIN is the only role left NULL, since it's a system account with no
+-- corresponding staff member.
+--
+-- ON DELETE SET NULL (not CASCADE): if a staff member is ever removed from
+-- the staff table, their login account should NOT be deleted along with
+-- them -- just unlinked. Deleting someone's login as a side effect of an
+-- unrelated staff-table change would be a surprising, destructive default.
+CREATE TABLE IF NOT EXISTS users (
+                                     user_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                     username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,          -- stored as a BCrypt hash, never plain text
+    role VARCHAR(20) NOT NULL,               -- one of: ADMIN, DOCTOR, NURSE, RECEPTIONIST
+    staff_id BIGINT NULL,
+    FOREIGN KEY (staff_id) REFERENCES staff(staff_id) ON DELETE SET NULL
+    );
