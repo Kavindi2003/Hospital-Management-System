@@ -38,9 +38,8 @@ public class SecurityConfig {
                 // send it back as an X-XSRF-TOKEN header on each fetch() call.
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Public: the landing page (and root, which serves it), the
-                        // login page itself, and static assets needed to render both
-                        .requestMatchers("/", "/index.html", "/login.html", "/css/**", "/js/**").permitAll()
+                        // Public: login page itself, and static assets needed to render it
+                        .requestMatchers("/login.html", "/css/**", "/js/**").permitAll()
 
                         // Dashboard + "who am I" endpoint: any logged-in user, any role
                         .requestMatchers("/pages/dashboard.html", "/api/auth/me").authenticated()
@@ -92,10 +91,25 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 // Access-denied case: a logged-in user hitting a page/API their role
-                // doesn't cover (e.g. a Nurse requesting /api/bills/**) gets a plain
-                // 403 rather than being silently redirected anywhere.
+                // doesn't cover (e.g. a Nurse requesting /api/bills/**, or a
+                // Receptionist requesting /pages/ehr.html -- applies to every
+                // role uniformly, based on the per-endpoint rules above).
+                // API requests get a clean JSON 403 body; page requests get
+                // redirected (a real redirect, so the address bar updates)
+                // back to their own dashboard, which shows a banner explaining
+                // why they landed there.
                 .exceptionHandling(ex -> ex
-                        .accessDeniedPage("/login.html?denied=true")
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            if (request.getRequestURI().startsWith("/api/")) {
+                                response.setStatus(403);
+                                response.setContentType("application/json");
+                                response.getWriter().write(
+                                        "{\"message\":\"You don't have permission to access this.\"}"
+                                );
+                            } else {
+                                response.sendRedirect("/pages/dashboard.html?denied=true");
+                            }
+                        })
                 )
                 .userDetailsService(userDetailsService);
 

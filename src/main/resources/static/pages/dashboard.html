@@ -22,6 +22,10 @@
         </form>
     </header>
 
+    <div id="deniedBanner" class="alert alert-error" hidden style="margin-bottom: 1.25rem;">
+        You don't have access to that page with your current role.
+    </div>
+
     <div class="section-label">Your modules</div>
     <div class="module-grid" id="moduleGrid"></div>
 
@@ -210,6 +214,13 @@
             showAddUserAlert('Could not reach the server.', 'error');
         }
     });
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('denied')) {
+        document.getElementById('deniedBanner').hidden = false;
+        // Strip the query param so a refresh doesn't keep re-showing this.
+        window.history.replaceState({}, '', '/pages/dashboard.html');
+    }
 
     fetch('/api/auth/me')
         .then(res => {
