@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Hospital Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/index.css">
+</head>
+<body>
+<div class="app">
+    <header>
+        <div class="brand">
+            <h1>Hospital Management System</h1>
+            <p>Logged in as <code id="whoami">&hellip;</code></p>
+        </div>
+        <form action="/logout" method="POST">
+            <button type="submit" class="btn btn-ghost">Log out</button>
+        </form>
+    </header>
+
+    <div id="deniedBanner" class="alert alert-error" hidden style="margin-bottom: 1.25rem;">
+        You don't have access to that page with your current role.
+    </div>
+
+    <div class="section-label">Your modules</div>
+    <div class="module-grid" id="moduleGrid"></div>
+
+    <div id="addUserPanel" hidden>
+        <div class="section-label">Admin &mdash; add a user</div>
+        <div class="stat-card" style="max-width: 420px; margin-bottom: 1.5rem;">
+            <div id="addUserAlert" class="alert" hidden style="margin-bottom: 0.85rem;"></div>
+            <form id="addUserForm">
+                <div class="field" style="margin-bottom: 0.85rem;">
+                    <label for="newUsername">Username</label>
+                    <input type="text" id="newUsername" required>
+                </div>
+                <div class="field" style="margin-bottom: 0.85rem;">
+                    <label for="newPassword">Password</label>
+                    <input type="password" id="newPassword" required>
+                </div>
+                <div class="field" style="margin-bottom: 0.85rem;">
+                    <label for="newRole">Role</label>
+                    <select id="newRole" style="width: 100%; font: inherit; background: var(--surface); border: 1px solid var(--border); color: var(--text); border-radius: 10px; padding: 0.65rem 0.85rem;">
+                        <option value="ADMIN">Admin</option>
+                        <option value="DOCTOR">Doctor</option>
+                        <option value="NURSE">Nurse</option>
+                        <option value="RECEPTIONIST">Receptionist</option>
+                    </select>
+                </div>
+                <div class="field" id="staffIdField" style="margin-bottom: 0.85rem; display: none;">
+                    <label for="newStaffId">Staff ID</label>
+                    <input type="number" id="newStaffId" min="1">
+                    <p class="hint" style="color: var(--warning);">
+                        &#9888; A staff record with this ID must already exist in the Staff module
+                        before creating this account &mdash; check <code>GET /staff</code> or the
+                        Staff page first if you're not sure of the ID. This links the login to
+                        that staff member (e.g. so a Doctor only sees their own patients' records).
+                    </p>
+                </div>
+                <button type="submit" class="btn btn-primary">Create account</button>
+            </form>
+        </div>
+
+        <div class="section-label">Existing accounts</div>
+        <div class="panel">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr><th>Username</th><th>Role</th><th>Staff ID</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody id="userListBody">
+                    <tr><td colspan="4" style="color: var(--text-muted);">Loading&hellip;</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Every module a role could see. `roles` lists who gets a card for it --
+    // ADMIN implicitly gets everything, so it's left out of each list below
+    // and handled as a special case in render().
+    const MODULES = [
+        { name: 'Patients',   desc: 'Patient records and intake details.',            href: '/pages/patient.html',     roles: ['DOCTOR', 'NURSE', 'RECEPTIONIST'] },
+        { name: 'Appointments', desc: 'Scheduling between patients and doctors.',      href: '/pages/appointment.html', roles: ['DOCTOR', 'RECEPTIONIST'] },
+        { name: 'Medical Records', desc: 'Diagnoses and treatment plans.',             href: '/pages/ehr.html',         roles: ['DOCTOR'] },
+        { name: 'Wards & Rooms', desc: 'Ward capacity and bed allocation.',             href: '/pages/ward.html',        roles: ['NURSE'] },
+        { name: 'Pharmacy Inventory', desc: 'Medicine stock and batch tracking.',       href: '/pages/inventory.html',   roles: ['NURSE'] },
+        { name: 'Billing', desc: 'Patient invoices and payment status.',               href: '/pages/billing.html',     roles: ['RECEPTIONIST'] },
+        { name: 'Staff', desc: 'Doctors, nurses, and support staff.',                   href: '/pages/staff.html',       roles: [] }, // admin-only
+    ];
+
+    function escapeHtml(str) {
+        if (str == null) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function render(username, role) {
+        document.getElementById('whoami').textContent = `${username} (${role})`;
+
+        const grid = document.getElementById('moduleGrid');
+        const visible = MODULES.filter(m => role === 'ADMIN' || m.roles.includes(role));
+
+        if (!visible.length) {
+            grid.innerHTML = '<p style="color: var(--text-muted);">No modules assigned to your role yet.</p>';
+            return;
+        }
+
+        grid.innerHTML = visible.map(m => `
+            <a href="${m.href}" class="module-card">
+                <h3>${escapeHtml(m.name)}</h3>
+                <p>${escapeHtml(m.desc)}</p>
+            </a>
+        `).join('');
+
+        if (role === 'ADMIN') {
+            document.getElementById('addUserPanel').hidden = false;
+            loadUsers();
+        }
+    }
+
+    function showAddUserAlert(message, type) {
+        const el = document.getElementById('addUserAlert');
+        el.textContent = message;
+        el.className = `alert alert-${type}`;
+        el.hidden = false;
+    }
+
+    async function loadUsers() {
+        const body = document.getElementById('userListBody');
+        try {
+            const res = await fetch('/api/auth/users');
+            if (!res.ok) throw new Error('Request failed');
+            const users = await res.json();
+
+            if (!users.length) {
+                body.innerHTML = '<tr><td colspan="4" style="color: var(--text-muted);">No accounts yet.</td></tr>';
+                return;
+            }
+
+            body.innerHTML = users.map(u => `
+                <tr>
+                    <td>${escapeHtml(u.username)}</td>
+                    <td><span class="badge">${escapeHtml(u.role)}</span></td>
+                    <td>${u.staffId != null ? escapeHtml(u.staffId) : '&mdash;'}</td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm" data-delete-id="${u.userId}">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        } catch (err) {
+            body.innerHTML = '<tr><td colspan="4" style="color: var(--danger);">Couldn\'t load accounts.</td></tr>';
+        }
+    }
+
+    document.getElementById('userListBody').addEventListener('click', async (e) => {
+        const btn = e.target.closest('[data-delete-id]');
+        if (!btn) return;
+
+        const id = btn.dataset.deleteId;
+        const username = btn.closest('tr').querySelector('td').textContent;
+        if (!confirm(`Delete account "${username}"? This can't be undone.`)) return;
+
+        try {
+            const res = await fetch(`/api/auth/users/${id}`, { method: 'DELETE' });
+            if (res.status === 204) {
+                loadUsers();
+                return;
+            }
+            const data = await res.json().catch(() => ({}));
+            showAddUserAlert(data.message || 'Could not delete that account.', 'error');
+        } catch (err) {
+            showAddUserAlert('Could not reach the server.', 'error');
+        }
+    });
+
+    document.getElementById('newRole').addEventListener('change', (e) => {
+        const needsStaff = ['DOCTOR', 'NURSE', 'RECEPTIONIST'].includes(e.target.value);
+        document.getElementById('staffIdField').style.display = needsStaff ? 'block' : 'none';
+    });
+
+    document.getElementById('addUserForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('newUsername').value.trim();
+        const password = document.getElementById('newPassword').value;
+        const role = document.getElementById('newRole').value;
+        const needsStaff = ['DOCTOR', 'NURSE', 'RECEPTIONIST'].includes(role);
+        const staffIdRaw = document.getElementById('newStaffId').value;
+        const staffId = (needsStaff && staffIdRaw) ? Number(staffIdRaw) : null;
+
+        try {
+            const res = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password, role, staffId })
+            });
+            const data = await res.json();
+
+            if (!res.ok) {
+                showAddUserAlert(data.message || 'Could not create the account.', 'error');
+                return;
+            }
+
+            showAddUserAlert(`Account "${data.username}" (${data.role}) created successfully.`, 'success');
+            document.getElementById('addUserForm').reset();
+            document.getElementById('staffIdField').style.display = 'none';
+            loadUsers();
+        } catch (err) {
+            showAddUserAlert('Could not reach the server.', 'error');
+        }
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('denied')) {
+        document.getElementById('deniedBanner').hidden = false;
+        // Strip the query param so a refresh doesn't keep re-showing this.
+        window.history.replaceState({}, '', '/pages/dashboard.html');
+    }
+
+    fetch('/api/auth/me')
+        .then(res => {
+            if (!res.ok) throw new Error('Not logged in');
+            return res.json();
+        })
+        .then(user => render(user.username, user.role))
+        .catch(() => { window.location.href = '/login.html'; });
+</script>
+</body>
+</html>

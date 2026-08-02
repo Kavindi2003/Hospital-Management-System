@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Pharmacy Inventory</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/inventory.css">
+</head>
+
+<body>
+
+<div class="loading-bar" id="loadingBar"></div>
+
+<div class="app">
+
+    <header>
+        <div class="brand">
+            <a href="/" class="back-link">← Back to modules</a>
+
+            <h1>Pharmacy Inventory</h1>
+
+            <p>
+                Manage medicine stock, prices, batches and expiration dates.
+                API: <code id="apiBadge">GET /api/inventory</code>
+            </p>
+        </div>
+
+        <div class="toolbar">
+            <div class="search-group">
+
+                <input
+                        type="number"
+                        id="filterItemId"
+                        class="id-filter"
+                        min="1"
+                        placeholder="Item ID">
+
+                <button
+                        type="button"
+                        class="btn btn-ghost"
+                        id="btnLookupItem">
+                    Find item
+                </button>
+
+                <button
+                        type="button"
+                        class="btn btn-ghost"
+                        id="btnRefresh">
+                    Refresh
+                </button>
+
+                <button
+                        type="button"
+                        class="btn btn-primary"
+                        id="btnNewItem">
+                    + Add item
+                </button>
+
+            </div>
+        </div>
+    </header>
+
+    <section class="stats">
+
+        <div class="stat-card">
+            <span>Total displayed</span>
+            <strong id="statTotal">0</strong>
+        </div>
+
+        <div class="stat-card">
+            <span>Current view</span>
+            <strong id="statView">All items</strong>
+        </div>
+
+        <div class="stat-card">
+            <span>Low stock</span>
+            <strong id="statLowStock">0</strong>
+        </div>
+
+        <div class="stat-card">
+            <span>Expired</span>
+            <strong id="statExpired">0</strong>
+        </div>
+
+    </section>
+
+    <section class="panel">
+
+        <div class="panel-head">
+            <h2 id="panelTitle">All inventory items</h2>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Item name</th>
+                    <th>Category</th>
+                    <th>Quantity</th>
+                    <th>Unit price</th>
+                    <th>Batch</th>
+                    <th>Expiration</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+
+                <tbody id="itemsBody"></tbody>
+
+            </table>
+        </div>
+
+        <div class="empty-state" id="emptyState" hidden>
+            No inventory items found.
+        </div>
+
+    </section>
+
+    <div class="app-footer">
+        Hospital Management System — Pharmacy and Inventory Module
+    </div>
+
+</div>
+
+<!-- Add/Edit form modal -->
+<div class="overlay" id="formOverlay">
+
+    <div class="modal">
+
+        <div class="modal-header">
+            <h3 id="formModalTitle">Add inventory item</h3>
+        </div>
+
+        <form id="itemForm">
+
+            <div class="modal-body">
+
+                <input type="hidden" id="editItemId">
+
+                <div class="field">
+                    <label for="itemName">Item name</label>
+                    <input
+                            type="text"
+                            id="itemName"
+                            maxlength="150"
+                            required>
+                </div>
+
+                <div class="field">
+                    <label for="category">Category</label>
+                    <input
+                            type="text"
+                            id="category"
+                            maxlength="100"
+                            required>
+                </div>
+
+                <div class="field">
+                    <label for="quantityInStock">
+                        Quantity in stock
+                    </label>
+
+                    <input
+                            type="number"
+                            id="quantityInStock"
+                            min="0"
+                            required>
+                </div>
+
+                <div class="field">
+                    <label for="unitPrice">Unit price</label>
+
+                    <input
+                            type="number"
+                            id="unitPrice"
+                            min="0"
+                            step="0.01"
+                            required>
+                </div>
+
+                <div class="field">
+                    <label for="batchNumber">Batch number</label>
+
+                    <input
+                            type="text"
+                            id="batchNumber"
+                            maxlength="100">
+                </div>
+
+                <div class="field">
+                    <label for="expirationDate">
+                        Expiration date
+                    </label>
+
+                    <input
+                            type="date"
+                            id="expirationDate">
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                        type="button"
+                        class="btn btn-ghost"
+                        id="btnCancelForm">
+                    Cancel
+                </button>
+
+                <button
+                        type="submit"
+                        class="btn btn-primary">
+                    Save item
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<!-- View item modal -->
+<div class="overlay" id="viewOverlay">
+
+    <div class="modal">
+
+        <div class="modal-header">
+            <h3 id="viewModalTitle">Inventory item</h3>
+        </div>
+
+        <div class="modal-body">
+            <dl class="detail-grid" id="viewDetails"></dl>
+        </div>
+
+        <div class="modal-footer">
+
+            <button
+                    type="button"
+                    class="btn btn-ghost"
+                    id="btnCloseView">
+                Close
+            </button>
+
+            <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="btnEditFromView">
+                Edit
+            </button>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- Delete confirmation modal -->
+<div class="overlay" id="deleteOverlay">
+
+    <div class="modal modal-narrow">
+
+        <div class="modal-header">
+            <h3>Delete inventory item</h3>
+        </div>
+
+        <div class="modal-body">
+
+            <p>
+                Are you sure you want to delete item
+                <strong id="deleteItemLabel"></strong>?
+            </p>
+
+            <p class="warning-text">
+                This action cannot be undone.
+            </p>
+
+        </div>
+
+        <div class="modal-footer">
+
+            <button
+                    type="button"
+                    class="btn btn-ghost"
+                    id="btnCancelDelete">
+                Cancel
+            </button>
+
+            <button
+                    type="button"
+                    class="btn btn-danger"
+                    id="btnConfirmDelete">
+                Delete
+            </button>
+
+        </div>
+
+    </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="/js/inventory.js"></script>
+
+</body>
+</html>

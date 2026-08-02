@@ -1,0 +1,85 @@
+/* ==========================================================================
+   dashboard.html — module directory cards
+   Loaded in addition to the shared /css/styles.css
+   ========================================================================== */
+
+.module-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+}
+
+.module-card {
+    position: relative;
+    display: block;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.4rem;
+    box-shadow: var(--shadow);
+    transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+}
+
+.module-card:hover {
+    transform: translateY(-2px);
+    background: var(--surface-elevated);
+    text-decoration: none;
+}
+
+.module-card.pending {
+    border-left: 3px dashed var(--border);
+    opacity: 0.72;
+    box-shadow: none;
+}
+
+.module-card .mod-code {
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.module-card h3 {
+    margin: 0 0 0.4rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.module-card p {
+    margin: 0 0 0.75rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+.module-card code {
+    color: var(--accent-hover);
+    font-size: 0.8em;
+    background: var(--accent-dim);
+    padding: 0.1em 0.4em;
+    border-radius: 4px;
+}
+
+.module-card .status {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent-hover);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.module-card.pending .status { color: var(--text-muted); }
+
+.section-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 0.9rem;
+}

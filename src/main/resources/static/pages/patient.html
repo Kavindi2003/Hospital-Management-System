@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Management | Hospital Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/patient.css">
+</head>
+<body>
+
+<header class="p-header">
+    <h1>Hospital Management System</h1>
+    <span>Patient Records</span>
+</header>
+
+<main class="p-main">
+
+    <div class="alert" id="status" hidden></div>
+
+    <div class="p-panel">
+        <h2 id="formTitle">Add New Patient</h2>
+        <div class="p-grid">
+            <div>
+                <label>First Name</label>
+                <input id="firstName" placeholder="e.g. John">
+            </div>
+            <div>
+                <label>Last Name</label>
+                <input id="lastName" placeholder="e.g. Silva">
+            </div>
+            <div>
+                <label>Date of Birth</label>
+                <input id="dateOfBirth" type="date">
+            </div>
+            <div>
+                <label>Age</label>
+                <input id="age" type="number" placeholder="e.g. 35">
+            </div>
+            <div>
+                <label>Gender</label>
+                <select id="gender">
+                    <option value="">Select</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Other</option>
+                </select>
+            </div>
+            <div>
+                <label>Blood Group</label>
+                <select id="bloodGroup">
+                    <option value="">Select</option>
+                    <option>O+</option><option>O-</option>
+                    <option>A+</option><option>A-</option>
+                    <option>B+</option><option>B-</option>
+                    <option>AB+</option><option>AB-</option>
+                </select>
+            </div>
+            <div>
+                <label>Phone Number</label>
+                <input id="phoneNumber" placeholder="e.g. 0771234567">
+            </div>
+            <div>
+                <label>Email</label>
+                <input id="email" type="email" placeholder="e.g. john@example.com">
+            </div>
+            <div>
+                <label>Address</label>
+                <input id="address" placeholder="e.g. Colombo">
+            </div>
+        </div>
+        <div class="p-actions">
+            <button class="btn btn-primary" id="saveBtn" onclick="savePatient()">Save Patient</button>
+            <button class="btn btn-ghost" id="cancelBtn" onclick="resetForm()" style="display:none;">Cancel Edit</button>
+        </div>
+    </div>
+
+    <div class="p-panel">
+        <h2>All Patients</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>DOB</th>
+                <th>Age</th>
+                <th>Gender</th>
+                <th>Blood</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Address</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="patientTableBody"></tbody>
+        </table>
+        <div class="p-empty" id="emptyState" style="display:none;">No patients yet. Add one above.</div>
+    </div>
+
+</main>
+
+<script>
+    const API_URL = "/api/patients";
+    let editingId = null;
+
+    async function loadPatients() {
+        try {
+            const res = await fetch(API_URL);
+            if (!res.ok) throw new Error("Server responded with " + res.status);
+            const patients = await res.json();
+            renderTable(patients);
+        } catch (err) {
+            showStatus("Could not connect to server. Is the Spring Boot app running? (" + err.message + ")", "error");
+            renderTable([]);
+        }
+    }
+
+    function renderTable(patients) {
+        const body = document.getElementById("patientTableBody");
+        const empty = document.getElementById("emptyState");
+        body.innerHTML = "";
+
+        if (!patients.length) {
+            empty.style.display = "block";
+            return;
+        }
+        empty.style.display = "none";
+
+        patients.forEach(p => {
+            const tr = document.createElement("tr");
+            const fullName = `${p.firstName || ""} ${p.lastName || ""}`.trim();
+            tr.innerHTML = `
+        <td class="id-tag">#${p.patientId}</td>
+        <td>${escapeHtml(fullName)}</td>
+        <td>${escapeHtml(p.dateOfBirth || "")}</td>
+        <td>${p.age != null ? p.age : ""}</td>
+        <td>${escapeHtml(p.gender || "")}</td>
+        <td>${escapeHtml(p.bloodGroup || "")}</td>
+        <td>${escapeHtml(p.phoneNumber || "")}</td>
+        <td>${escapeHtml(p.email || "")}</td>
+        <td>${escapeHtml(p.address || "")}</td>
+        <td class="row-actions">
+          <button class="p-edit-btn" onclick="editPatient(${p.patientId})">Edit</button>
+          <button class="p-delete-btn" onclick="deletePatient(${p.patientId})">Delete</button>
+        </td>
+      `;
+            body.appendChild(tr);
+            tr.dataset.patient = JSON.stringify(p);
+        });
+    }
+
+    async function savePatient() {
+        const patient = {
+            firstName: val("firstName"),
+            lastName: val("lastName"),
+            dateOfBirth: val("dateOfBirth"),
+            age: val("age") ? parseInt(val("age")) : null,
+            gender: val("gender"),
+            bloodGroup: val("bloodGroup"),
+            phoneNumber: val("phoneNumber"),
+            email: val("email"),
+            address: val("address")
+        };
+
+        if (!patient.firstName || !patient.lastName) {
+            showStatus("First name and last name are required.", "error");
+            return;
+        }
+        if (!patient.dateOfBirth) {
+            showStatus("Date of birth is required.", "error");
+            return;
+        }
+        if (!patient.gender) {
+            showStatus("Gender is required.", "error");
+            return;
+        }
+
+        try {
+            let res;
+            if (editingId) {
+                res = await fetch(`${API_URL}/${editingId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(patient)
+                });
+            } else {
+                res = await fetch(API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(patient)
+                });
+            }
+            if (!res.ok) throw new Error("Server responded with " + res.status);
+
+            showStatus(editingId ? "Patient updated successfully." : "Patient added successfully.", "success");
+            resetForm();
+            loadPatients();
+        } catch (err) {
+            showStatus("Failed to save patient. " + err.message, "error");
+        }
+    }
+
+    function editPatient(id) {
+        const row = [...document.querySelectorAll("#patientTableBody tr")]
+            .find(tr => JSON.parse(tr.dataset.patient).patientId === id);
+        if (!row) return;
+        const p = JSON.parse(row.dataset.patient);
+
+        document.getElementById("firstName").value = p.firstName || "";
+        document.getElementById("lastName").value = p.lastName || "";
+        document.getElementById("dateOfBirth").value = p.dateOfBirth || "";
+        document.getElementById("age").value = p.age || "";
+        document.getElementById("gender").value = p.gender || "";
+        document.getElementById("bloodGroup").value = p.bloodGroup || "";
+        document.getElementById("phoneNumber").value = p.phoneNumber || "";
+        document.getElementById("email").value = p.email || "";
+        document.getElementById("address").value = p.address || "";
+
+        editingId = id;
+        document.getElementById("formTitle").textContent = "Edit Patient #" + id;
+        document.getElementById("saveBtn").textContent = "Update Patient";
+        document.getElementById("cancelBtn").style.display = "inline-block";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function deletePatient(id) {
+        if (!confirm("Delete this patient record? This cannot be undone.")) return;
+        try {
+            const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+            if (!res.ok) throw new Error("Server responded with " + res.status);
+            showStatus("Patient deleted.", "success");
+            loadPatients();
+        } catch (err) {
+            showStatus("Failed to delete patient. " + err.message, "error");
+        }
+    }
+
+    function resetForm() {
+        editingId = null;
+        ["firstName","lastName","dateOfBirth","age","gender","bloodGroup","phoneNumber","email","address"].forEach(id => val(id, ""));
+        document.getElementById("formTitle").textContent = "Add New Patient";
+        document.getElementById("saveBtn").textContent = "Save Patient";
+        document.getElementById("cancelBtn").style.display = "none";
+    }
+
+    function val(id, set) {
+        const el = document.getElementById(id);
+        if (set !== undefined) { el.value = set; return; }
+        return el.value.trim();
+    }
+
+    function showStatus(msg, type) {
+        const el = document.getElementById("status");
+        el.textContent = msg;
+        el.className = "alert alert-" + type;
+        el.hidden = false;
+        setTimeout(() => { el.hidden = true; }, 4000);
+    }
+
+    function escapeHtml(str) {
+        const d = document.createElement("div");
+        d.textContent = str;
+        return d.innerHTML;
+    }
+
+    loadPatients();
+</script>
+
+</body>
+</html>

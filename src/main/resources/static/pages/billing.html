@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing & Invoicing | Hospital Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/billing.css">
+</head>
+<body>
+<div class="app">
+    <header>
+        <div class="brand">
+            <h1>Billing &amp; Invoicing</h1>
+            <p>Patient invoices and payment status. <code>/api/bills</code></p>
+            <a href="/pages/dashboard.html" class="back-link">&larr; Back to dashboard</a>
+        </div>
+    </header>
+
+    <div class="form-panel-wrap">
+        <div class="panel-head">
+            <h2>Create New Bill</h2>
+        </div>
+        <div class="form-body">
+            <input type="number" id="patientId" placeholder="Patient ID">
+            <input type="number" id="totalAmount" placeholder="Total Amount" step="0.01">
+            <select id="paymentStatus">
+                <option value="UNPAID">UNPAID</option>
+                <option value="PARTIAL">PARTIAL</option>
+                <option value="PAID">PAID</option>
+            </select>
+            <input type="date" id="billingDate">
+            <button class="btn btn-primary" onclick="createBill()">Create Bill</button>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-head">
+            <h2>All Bills</h2>
+            <button class="btn btn-ghost" onclick="loadBills()">Refresh</button>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>Bill ID</th>
+                    <th>Patient ID</th>
+                    <th>Total Amount</th>
+                    <th>Status</th>
+                    <th>Billing Date</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="billsTableBody">
+                <!-- rows inserted by JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="/js/billing.js"></script>
+</body>
+</html>

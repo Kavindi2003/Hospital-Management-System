@@ -1,0 +1,42 @@
+/* ==========================================================================
+   billing.html — Billing & Invoicing module only
+   Loaded in addition to the shared /css/styles.css
+   ========================================================================== */
+
+.form-panel-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+
+.form-panel-wrap .panel-head { margin: 0; }
+
+.form-body {
+    padding: 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.form-body input,
+.form-body select {
+    flex: 1 1 160px;
+}
+
+/* Payment status pills in the table */
+.status-PAID {
+    color: var(--accent-hover);
+    font-weight: 600;
+}
+.status-UNPAID {
+    color: var(--danger);
+    font-weight: 600;
+}
+.status-PARTIAL {
+    color: var(--warning);
+    font-weight: 600;
+}
