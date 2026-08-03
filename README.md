@@ -190,12 +190,12 @@ The Medical Records module additionally scopes `GET /api/medical-records` to the
 | Name | Contribution |
 |---|---|
 | *(K.G. Thanthilage)* | Authentication & role-based access control system, EHR module, unified frontend design system, database configuration and integrity fixes, cross-team code review and Git integration |
-| *(Vithanage H.I.)* | Staff module |
-| *(M.L.Y.A. Jayakody)* | Billing module |
-| *(W.K.T. Nilmini)* | Ward & Room Allocation module |
-| *(T.H.S. Hansanie)* | Appointment module |
-| *(J.M.B.P.K. Jayasundara)* | Patient module |
-| *(Pramudi U. Perera)* | Pharmacy Inventory module |
+| *(Vithanage H.I.)* | Staff module and module frontend |
+| *(M.L.Y.A. Jayakody)* | Billing module and module frontend |
+| *(W.K.T. Nilmini)* | Ward & Room Allocation module and module frontend |
+| *(T.H.S. Hansanie)* | Appointment module and module frontend|
+| *(J.M.B.P.K. Jayasundara)* | Patient module and module frontend|
+| *(Pramudi U. Perera)* | Pharmacy Inventory module and module frontend|
 
 ---
 
